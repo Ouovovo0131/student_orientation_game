@@ -11,7 +11,8 @@ interface TopNavigationProps {
 
 export function TopNavigation({ score, total }: TopNavigationProps) {
   const navigate = useNavigate();
-  const { uid, logout, loading } = useGame();
+  const { uid, player, logout, loading } = useGame();
+  const isAdmin = player?.role === "admin";
 
   return (
     <header className="sticky top-0 z-30 border-b-4 border-black bg-[#FFF6D6]">
@@ -22,6 +23,13 @@ export function TopNavigation({ score, total }: TopNavigationProps) {
         </Link>
         <div className="flex items-center gap-3">
           <NeoBadge tone="info">分數 {score} / {total}</NeoBadge>
+          {uid && isAdmin && (
+            <Link to="/redeem">
+              <NeoButton variant="primary" className="min-h-0 px-3 py-2 text-sm">
+                前往兌換頁
+              </NeoButton>
+            </Link>
+          )}
           {uid && (
             <NeoButton
               variant="secondary"
