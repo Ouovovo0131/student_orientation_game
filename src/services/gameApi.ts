@@ -15,6 +15,7 @@ const PLAYERS_COLLECTION = "players";
 const ADMINS_COLLECTION = "admins";
 const SYSTEM_COLLECTION = "system";
 const REDEEM_CONTROL_DOCUMENT = "redeemControl";
+const ADMIN_EMAILS = ["s310165@hlhs.hlc.edu.tw"];
 
 const DEFAULT_REDEEM_CONTROL: RedeemControl = {
   isOpen: false,
@@ -122,11 +123,12 @@ async function getCurrentIdentity(expectedUid: string): Promise<CurrentIdentity>
     throw new Error("無法取得登入帳號資訊，請重新登入後再試。");
   }
 
+  const normalizedEmail = email.toLowerCase();
   const adminSnapshot = await getDoc(getAdminRef(currentUid));
   return {
     uid: currentUid,
     email,
-    role: adminSnapshot.exists() ? "admin" : "player",
+    role: adminSnapshot.exists() || ADMIN_EMAILS.includes(normalizedEmail) ? "admin" : "player",
   };
 }
 
