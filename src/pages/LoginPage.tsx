@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageContainer } from "../components/layout/PageContainer";
 import { NeoButton } from "../components/ui/NeoButton";
@@ -6,9 +7,15 @@ import { useGame } from "../hooks/useGame";
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const { loginWithSchoolAccount, loading } = useGame();
+  const { loginWithSchoolAccount, loading, uid } = useGame();
 
   const schoolDomain = "@hlhs.hlc.edu.tw";
+
+  useEffect(() => {
+    if (uid) {
+      navigate("/checkpoints", { replace: true });
+    }
+  }, [uid, navigate]);
 
   return (
     <PageContainer className="max-w-xl">
@@ -23,7 +30,6 @@ export function LoginPage() {
             event.preventDefault();
             try {
               await loginWithSchoolAccount();
-              navigate("/checkpoints");
             } catch {
               // GameContext 會把錯誤寫進全域狀態，這裡只需保留流程。
             }

@@ -1,4 +1,9 @@
-import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+import {
+  getRedirectResult,
+  GoogleAuthProvider,
+  signInWithRedirect,
+  signOut,
+} from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { getFirebaseAuth } from "../firebase/client";
 
@@ -12,14 +17,20 @@ function validateSchoolEmail(email: string | null | undefined): string {
   return normalizedEmail;
 }
 
-export async function schoolLogin(): Promise<string> {
+export async function schoolLogin(): Promise<string | null> {
+  const auth = getFirebaseAuth();
   const provider = new GoogleAuthProvider();
   provider.setCustomParameters({ hd: SCHOOL_EMAIL_DOMAIN.slice(1) });
 
   try {
-    const result = await signInWithPopup(getFirebaseAuth(), provider);
-    validateSchoolEmail(result.user.email);
-    return result.user.uid;
+    const redirectResult = await getRedirectResult(auth);
+    if (redirectResult?.user) {
+      validateSchoolEmail(redirectResult.user.email);
+      return redirectResult.user.uid;
+    }
+
+    await signInWithRedirect(auth, provider);
+    return null;
   } catch (error) {
     if (error instanceof FirebaseError) {
       if (error.code === "auth/invalid-api-key") {
@@ -30,19 +41,19 @@ export async function schoolLogin(): Promise<string> {
       if (error.code === "auth/configuration-not-found") {
         throw new Error("Firebase Auth 設定不存在，請確認 Firebase 專案已啟用 Authentication。");
       }
-      if (error.code === "auth/popup-closed-by-user") {
-        throw new Error("登入視窗已關閉，請重新點擊登入按鈕。");
-      }
       if (error.code === "auth/account-exists-with-different-credential") {
         throw new Error("這個學校帳號已用其他登入方式註冊，請確認 Firebase 登入設定。");
       }
       if (error.code === "auth/unauthorized-domain") {
         throw new Error("目前網域尚未加入 Firebase Auth 授權網域，請檢查 Firebase Console 設定。");
       }
+      if (error.code === "auth/redirect-cancelled-by-user") {
+        throw new Error("你已取消登入流程，請再試一次。");
+      }
     }
 
     try {
-      await signOut(getFirebaseAuth());
+      await signOut(auth);
     } catch {
       // Ignore sign-out failures during cleanup.
     }
