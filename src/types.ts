@@ -35,6 +35,7 @@ export interface GameContextValue {
   uid: string | null;
   totalCheckpoints: number;
   loginWithSchoolAccount: () => Promise<void>;
+  logout: () => Promise<void>;
   refreshPlayer: () => Promise<void>;
   refreshRedeemControl: () => Promise<void>;
   setRedeemControl: (payload: RedeemControl) => Promise<void>;

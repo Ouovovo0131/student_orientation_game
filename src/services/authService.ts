@@ -53,3 +53,14 @@ export async function schoolLogin(): Promise<string> {
     throw new Error("學校帳號登入失敗，請稍後再試。");
   }
 }
+
+export async function schoolLogout(): Promise<void> {
+  try {
+    await signOut(getFirebaseAuth());
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`登出失敗：${error.message}`);
+    }
+    throw new Error("登出失敗，請稍後再試。");
+  }
+}

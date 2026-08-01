@@ -6,7 +6,7 @@ import {
   type PropsWithChildren,
 } from "react";
 import { CHECKPOINTS } from "../assets/checkpoints";
-import { schoolLogin } from "../services/authService";
+import { schoolLogin, schoolLogout } from "../services/authService";
 import {
   completeStage,
   getPlayerState,
@@ -76,6 +76,14 @@ export function GameProvider({ children }: PropsWithChildren) {
     setRedeemControlState(control);
   }, [withTask]);
 
+  const logout = useCallback(async () => {
+    await withTask("正在登出帳號", schoolLogout);
+    localStorage.removeItem("orientation_uid");
+    setUid(null);
+    setPlayer(null);
+    setRedeemControlState(DEFAULT_REDEEM_CONTROL);
+  }, [withTask]);
+
   const setRedeemControl = useCallback(async (payload: RedeemControl) => {
     if (!uid) {
       throw new Error("尚未登入，無法調整兌換開關。請先登入。");
@@ -113,6 +121,7 @@ export function GameProvider({ children }: PropsWithChildren) {
       uid,
       totalCheckpoints: CHECKPOINTS.length,
       loginWithSchoolAccount,
+      logout,
       refreshPlayer,
       refreshRedeemControl,
       setRedeemControl,
@@ -127,6 +136,7 @@ export function GameProvider({ children }: PropsWithChildren) {
       redeemControl,
       uid,
       loginWithSchoolAccount,
+      logout,
       refreshPlayer,
       refreshRedeemControl,
       setRedeemControl,

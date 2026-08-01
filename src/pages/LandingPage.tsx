@@ -17,9 +17,16 @@ export function LandingPage() {
           每個關卡都有一段重要校園資訊影片。只有完整播放到結束，系統才會自動記錄該關分數。
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link to={uid ? "/checkpoints" : "/login"}>
-            <NeoButton>開始挑戰</NeoButton>
-          </Link>
+          {!uid && (
+            <Link to="/login">
+              <NeoButton>登入</NeoButton>
+            </Link>
+          )}
+          {uid && (
+            <Link to="/checkpoints">
+              <NeoButton>開始挑戰</NeoButton>
+            </Link>
+          )}
           <Link to="/checkpoints">
             <NeoButton variant="secondary">查看關卡</NeoButton>
           </Link>
