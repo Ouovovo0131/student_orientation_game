@@ -57,3 +57,17 @@
 - `score` 只能遞增且每次最多 +1
 - `completedStages` 只能新增 `true`，不可回寫 `false`
 - `isRedeemed` 只能由 `false` 變成 `true`
+
+目前專案已提供可直接套用的規則檔：`firestore.rules`。
+
+套用方式：
+
+1. 開啟 Firebase Console -> Firestore Database -> Rules
+2. 將 `firestore.rules` 全部內容貼上並發布
+3. 重新登入一次遊戲（讓最新 auth token 生效）
+
+若仍出現 `permission-denied`，先確認：
+
+- 登入帳號是否為 `@hlhs.hlc.edu.tw`
+- Firestore 實際讀寫路徑是否為 `players/{uid}`
+- 規則是否真的已發布到目前使用的 Firebase 專案

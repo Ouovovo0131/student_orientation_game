@@ -1,0 +1,58 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isSchoolAccount() {
+      return request.auth.token.email is string
+        && request.auth.token.email.matches('^[^@]+@hlhs\\.hlc\\.edu\\.tw$');
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function hasValidShape() {
+      return request.resource.data.keys().hasOnly([
+        'score',
+        'isRedeemed',
+        'redeemTime',
+        'completedStages'
+      ])
+      && request.resource.data.score is int
+      && request.resource.data.isRedeemed is bool
+      && (request.resource.data.redeemTime == null || request.resource.data.redeemTime is string)
+      && request.resource.data.completedStages is map;
+    }
+
+    function isInitialDocument() {
+      return hasValidShape()
+        && request.resource.data.score == 0
+        && request.resource.data.isRedeemed == false
+        && request.resource.data.redeemTime == null
+        && request.resource.data.completedStages.size() == 0;
+    }
+
+    function isValidProgressUpdate() {
+      return hasValidShape()
+        && request.resource.data.score >= resource.data.score
+        && request.resource.data.score <= resource.data.score + 1
+        && request.resource.data.completedStages.size() >= resource.data.completedStages.size()
+        && request.resource.data.completedStages.size() <= resource.data.completedStages.size() + 1
+        && request.resource.data.completedStages.values().hasOnly([true])
+        && (
+          request.resource.data.isRedeemed == resource.data.isRedeemed
+          || (resource.data.isRedeemed == false && request.resource.data.isRedeemed == true)
+        );
+    }
+
+    match /players/{uid} {
+      allow read: if isOwner(uid) && isSchoolAccount();
+      allow create: if isOwner(uid) && isSchoolAccount() && isInitialDocument();
+      allow update: if isOwner(uid) && isSchoolAccount() && isValidProgressUpdate();
+      allow delete: if false;
+    }
+  }
+}
