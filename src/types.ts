@@ -25,7 +25,7 @@ export interface GameContextValue {
   player: PlayerState | null;
   uid: string | null;
   totalCheckpoints: number;
-  loginAnonymously: () => Promise<void>;
+  loginWithSchoolAccount: (email: string, password: string) => Promise<void>;
   refreshPlayer: () => Promise<void>;
   completeCheckpoint: (stageId: StageId) => Promise<void>;
   redeemReward: () => Promise<void>;

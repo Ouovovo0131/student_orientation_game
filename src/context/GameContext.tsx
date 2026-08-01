@@ -6,7 +6,7 @@ import {
   type PropsWithChildren,
 } from "react";
 import { CHECKPOINTS } from "../assets/checkpoints";
-import { anonymousLogin } from "../services/authService";
+import { schoolLogin } from "../services/authService";
 import { completeStage, getPlayerState, redeem } from "../services/gameApi";
 import type { GameContextValue, PlayerState, StageId } from "../types";
 
@@ -47,8 +47,8 @@ export function GameProvider({ children }: PropsWithChildren) {
     setPlayer(data);
   }, [uid, withTask]);
 
-  const loginAnonymously = useCallback(async () => {
-    const currentUid = await withTask("建立匿名玩家身分中", anonymousLogin);
+  const loginWithSchoolAccount = useCallback(async (email: string, password: string) => {
+    const currentUid = await withTask("使用學校帳號登入中", () => schoolLogin(email, password));
     localStorage.setItem("orientation_uid", currentUid);
     setUid(currentUid);
     const state = await withTask("建立玩家初始資料中", () => getPlayerState(currentUid));
@@ -82,7 +82,7 @@ export function GameProvider({ children }: PropsWithChildren) {
       player,
       uid,
       totalCheckpoints: CHECKPOINTS.length,
-      loginAnonymously,
+      loginWithSchoolAccount,
       refreshPlayer,
       completeCheckpoint,
       redeemReward,
@@ -93,7 +93,7 @@ export function GameProvider({ children }: PropsWithChildren) {
       error,
       player,
       uid,
-      loginAnonymously,
+      loginWithSchoolAccount,
       refreshPlayer,
       completeCheckpoint,
       redeemReward,
