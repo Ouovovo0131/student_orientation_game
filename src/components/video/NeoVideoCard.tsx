@@ -43,7 +43,7 @@ export function NeoVideoCard({
           modestbranding: 1,
         },
         events: {
-          onStateChange: async (event) => {
+          onStateChange: async (event: YT.PlayerEvent) => {
             if (event.data !== YT.PlayerState.ENDED) {
               return;
             }
@@ -136,9 +136,9 @@ function getYouTubeVideoId(url: string): string | null {
   return null;
 }
 
-let youtubeApiLoader: Promise<typeof YT> | null = null;
+let youtubeApiLoader: Promise<YT.YTGlobal> | null = null;
 
-function loadYouTubeApi(): Promise<typeof YT> {
+function loadYouTubeApi(): Promise<YT.YTGlobal> {
   if (window.YT?.Player) {
     return Promise.resolve(window.YT);
   }
