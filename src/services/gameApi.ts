@@ -66,7 +66,9 @@ function normalizeRedeemControl(input: DocumentData | undefined): RedeemControl 
 function mapFirebaseError(error: unknown): Error {
   if (error instanceof FirebaseError) {
     if (error.code === "permission-denied") {
-      return new Error("你沒有權限執行此操作，請確認已完成登入且 Firebase 安全規則正確。");
+      return new Error(
+        "你沒有權限執行此操作。請先確認：1) 已在 Firebase Console 發布最新 firestore.rules；2) 目前登入的是學校帳號；3) VITE_FIREBASE_PROJECT_ID 指向你正在查看的同一個 Firebase 專案。",
+      );
     }
     if (error.code === "unavailable") {
       return new Error("目前無法連線到 Firebase，請稍後再試。");

@@ -23,11 +23,6 @@ service cloud.firestore {
       return isAdmin() ? 'admin' : 'player';
     }
 
-    function accountMatchesAuth() {
-      return request.auth.token.email is string
-        && request.resource.data.account == request.auth.token.email;
-    }
-
     function roleMatchesAuth() {
       return request.resource.data.role == currentRole();
     }
@@ -51,7 +46,6 @@ service cloud.firestore {
 
     function isInitialDocument() {
       return hasValidShape()
-        && accountMatchesAuth()
         && roleMatchesAuth()
         && request.resource.data.score == 0
         && request.resource.data.isRedeemed == false
@@ -66,7 +60,6 @@ service cloud.firestore {
 
     function isValidProgressUpdate() {
       return hasValidShape()
-        && accountMatchesAuth()
         && roleMatchesAuth()
         && request.resource.data.score >= resource.data.score
         && request.resource.data.score <= resource.data.score + 1
