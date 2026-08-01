@@ -1,4 +1,5 @@
 export type StageId = string;
+export type PlayerRole = "admin" | "player";
 
 export interface Checkpoint {
   id: StageId;
@@ -12,6 +13,13 @@ export interface PlayerState {
   isRedeemed: boolean;
   redeemTime: string | null;
   completedStages: Record<StageId, boolean>;
+  account: string;
+  role: PlayerRole;
+}
+
+export interface RedeemControl {
+  isOpen: boolean;
+  qrCodeUrl: string | null;
 }
 
 export interface UserSession {
@@ -23,10 +31,13 @@ export interface GameContextValue {
   taskMessage: string;
   error: string | null;
   player: PlayerState | null;
+  redeemControl: RedeemControl;
   uid: string | null;
   totalCheckpoints: number;
   loginWithSchoolAccount: () => Promise<void>;
   refreshPlayer: () => Promise<void>;
+  refreshRedeemControl: () => Promise<void>;
+  setRedeemControl: (payload: RedeemControl) => Promise<void>;
   completeCheckpoint: (stageId: StageId) => Promise<void>;
   redeemReward: () => Promise<void>;
 }

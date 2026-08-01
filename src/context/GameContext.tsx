@@ -7,12 +7,22 @@ import {
 } from "react";
 import { CHECKPOINTS } from "../assets/checkpoints";
 import { schoolLogin } from "../services/authService";
-import { completeStage, getPlayerState, redeem } from "../services/gameApi";
-import type { GameContextValue, PlayerState, StageId } from "../types";
+import {
+  completeStage,
+  getPlayerState,
+  getRedeemControl,
+  redeem,
+  updateRedeemControl,
+} from "../services/gameApi";
+import type { GameContextValue, PlayerState, RedeemControl, StageId } from "../types";
 
 export const GameContext = createContext<GameContextValue | null>(null);
 
 const DEFAULT_TASK = "等待玩家開始闖關";
+const DEFAULT_REDEEM_CONTROL: RedeemControl = {
+  isOpen: false,
+  qrCodeUrl: null,
+};
 
 export function GameProvider({ children }: PropsWithChildren) {
   const [loading, setLoading] = useState(false);
@@ -22,6 +32,7 @@ export function GameProvider({ children }: PropsWithChildren) {
     localStorage.getItem("orientation_uid"),
   );
   const [player, setPlayer] = useState<PlayerState | null>(null);
+  const [redeemControl, setRedeemControlState] = useState<RedeemControl>(DEFAULT_REDEEM_CONTROL);
 
   const withTask = useCallback(async <T,>(message: string, action: () => Promise<T>) => {
     setLoading(true);
@@ -47,13 +58,31 @@ export function GameProvider({ children }: PropsWithChildren) {
     setPlayer(data);
   }, [uid, withTask]);
 
+  const refreshRedeemControl = useCallback(async () => {
+    if (!uid) {
+      return;
+    }
+    const control = await withTask("同步兌換開放狀態中", () => getRedeemControl(uid));
+    setRedeemControlState(control);
+  }, [uid, withTask]);
+
   const loginWithSchoolAccount = useCallback(async () => {
     const currentUid = await withTask("使用學校帳號登入中", schoolLogin);
     localStorage.setItem("orientation_uid", currentUid);
     setUid(currentUid);
     const state = await withTask("建立玩家初始資料中", () => getPlayerState(currentUid));
+    const control = await withTask("同步兌換開放狀態中", () => getRedeemControl(currentUid));
     setPlayer(state);
+    setRedeemControlState(control);
   }, [withTask]);
+
+  const setRedeemControl = useCallback(async (payload: RedeemControl) => {
+    if (!uid) {
+      throw new Error("尚未登入，無法調整兌換開關。請先登入。");
+    }
+    const control = await withTask("管理員正在更新兌換開關", () => updateRedeemControl(uid, payload));
+    setRedeemControlState(control);
+  }, [uid, withTask]);
 
   const completeCheckpoint = useCallback(
     async (stageId: StageId) => {
@@ -80,10 +109,13 @@ export function GameProvider({ children }: PropsWithChildren) {
       taskMessage,
       error,
       player,
+      redeemControl,
       uid,
       totalCheckpoints: CHECKPOINTS.length,
       loginWithSchoolAccount,
       refreshPlayer,
+      refreshRedeemControl,
+      setRedeemControl,
       completeCheckpoint,
       redeemReward,
     }),
@@ -92,9 +124,12 @@ export function GameProvider({ children }: PropsWithChildren) {
       taskMessage,
       error,
       player,
+      redeemControl,
       uid,
       loginWithSchoolAccount,
       refreshPlayer,
+      refreshRedeemControl,
+      setRedeemControl,
       completeCheckpoint,
       redeemReward,
     ],

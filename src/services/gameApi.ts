@@ -8,16 +8,32 @@ import {
 } from "firebase/firestore";
 import { CHECKPOINTS } from "../assets/checkpoints";
 import { getFirebaseAuth, getFirebaseDb } from "../firebase/client";
-import type { PlayerState, StageId } from "../types";
+import type { PlayerRole, PlayerState, RedeemControl, StageId } from "../types";
 
 const PLAYERS_COLLECTION = "players";
+const ADMINS_COLLECTION = "admins";
+const SYSTEM_COLLECTION = "system";
+const REDEEM_CONTROL_DOCUMENT = "redeemControl";
 
-function initialPlayerState(): PlayerState {
+const DEFAULT_REDEEM_CONTROL: RedeemControl = {
+  isOpen: false,
+  qrCodeUrl: null,
+};
+
+interface CurrentIdentity {
+  uid: string;
+  email: string;
+  role: PlayerRole;
+}
+
+function initialPlayerState(identity: CurrentIdentity): PlayerState {
   return {
     score: 0,
     isRedeemed: false,
     redeemTime: null,
     completedStages: {},
+    account: identity.email,
+    role: identity.role,
   };
 }
 
@@ -31,6 +47,18 @@ function normalizePlayerState(input: DocumentData | undefined): PlayerState {
       typeof data.completedStages === "object" && data.completedStages
         ? (data.completedStages as Record<StageId, boolean>)
         : {},
+    account: typeof data.account === "string" ? data.account : "",
+    role: data.role === "admin" ? "admin" : "player",
+  };
+}
+
+function normalizeRedeemControl(input: DocumentData | undefined): RedeemControl {
+  const data = input ?? {};
+  return {
+    isOpen: Boolean(data.isOpen),
+    qrCodeUrl: typeof data.qrCodeUrl === "string" && data.qrCodeUrl.trim()
+      ? data.qrCodeUrl.trim()
+      : null,
   };
 }
 
@@ -50,32 +78,65 @@ function getPlayerRef(uid: string) {
   return doc(getFirebaseDb(), PLAYERS_COLLECTION, uid);
 }
 
-function assertCurrentUser(uid: string) {
-  const currentUid = getFirebaseAuth().currentUser?.uid;
-  if (!currentUid || currentUid !== uid) {
+function getAdminRef(uid: string) {
+  return doc(getFirebaseDb(), ADMINS_COLLECTION, uid);
+}
+
+function getRedeemControlRef() {
+  return doc(getFirebaseDb(), SYSTEM_COLLECTION, REDEEM_CONTROL_DOCUMENT);
+}
+
+async function getCurrentIdentity(expectedUid: string): Promise<CurrentIdentity> {
+  const user = getFirebaseAuth().currentUser;
+  const currentUid = user?.uid;
+  if (!currentUid || currentUid !== expectedUid) {
     throw new Error("登入狀態已失效，請重新登入後再試。");
   }
+
+  const email = user.email?.trim().toLowerCase();
+  if (!email) {
+    throw new Error("無法取得登入帳號資訊，請重新登入後再試。");
+  }
+
+  const adminSnapshot = await getDoc(getAdminRef(currentUid));
+  return {
+    uid: currentUid,
+    email,
+    role: adminSnapshot.exists() ? "admin" : "player",
+  };
 }
 
 export async function getPlayerState(uid: string): Promise<PlayerState> {
-  assertCurrentUser(uid);
+  const identity = await getCurrentIdentity(uid);
   const ref = getPlayerRef(uid);
 
   try {
     const snapshot = await getDoc(ref);
     if (!snapshot.exists()) {
-      const initial = initialPlayerState();
+      const initial = initialPlayerState(identity);
       await setDoc(ref, initial);
       return initial;
     }
-    return normalizePlayerState(snapshot.data());
+
+    const data = normalizePlayerState(snapshot.data());
+    if (data.account !== identity.email || data.role !== identity.role) {
+      const next = {
+        ...data,
+        account: identity.email,
+        role: identity.role,
+      };
+      await setDoc(ref, next, { merge: true });
+      return next;
+    }
+
+    return data;
   } catch (error) {
     throw mapFirebaseError(error);
   }
 }
 
 export async function completeStage(uid: string, stageId: StageId): Promise<PlayerState> {
-  assertCurrentUser(uid);
+  await getCurrentIdentity(uid);
   const ref = getPlayerRef(uid);
 
   try {
@@ -108,13 +169,20 @@ export async function completeStage(uid: string, stageId: StageId): Promise<Play
 }
 
 export async function redeem(uid: string): Promise<PlayerState> {
-  assertCurrentUser(uid);
+  await getCurrentIdentity(uid);
   const ref = getPlayerRef(uid);
+  const controlRef = getRedeemControlRef();
 
   try {
     await runTransaction(getFirebaseDb(), async (transaction) => {
       const snapshot = await transaction.get(ref);
       const current = normalizePlayerState(snapshot.data());
+      const controlSnapshot = await transaction.get(controlRef);
+      const control = normalizeRedeemControl(controlSnapshot.data());
+
+      if (!control.isOpen) {
+        throw new Error("兌換尚未開放，請先由管理員開啟兌換。");
+      }
 
       if (current.score < CHECKPOINTS.length) {
         throw new Error("尚未達成全部關卡，無法兌換。");
@@ -136,6 +204,39 @@ export async function redeem(uid: string): Promise<PlayerState> {
 
     const next = await getDoc(ref);
     return normalizePlayerState(next.data());
+  } catch (error) {
+    throw mapFirebaseError(error);
+  }
+}
+
+export async function getRedeemControl(uid: string): Promise<RedeemControl> {
+  await getCurrentIdentity(uid);
+
+  try {
+    const snapshot = await getDoc(getRedeemControlRef());
+    if (!snapshot.exists()) {
+      return DEFAULT_REDEEM_CONTROL;
+    }
+    return normalizeRedeemControl(snapshot.data());
+  } catch (error) {
+    throw mapFirebaseError(error);
+  }
+}
+
+export async function updateRedeemControl(uid: string, payload: RedeemControl): Promise<RedeemControl> {
+  const identity = await getCurrentIdentity(uid);
+  if (identity.role !== "admin") {
+    throw new Error("只有管理員可以調整兌換開關。");
+  }
+
+  const next: RedeemControl = {
+    isOpen: payload.isOpen,
+    qrCodeUrl: payload.qrCodeUrl?.trim() ? payload.qrCodeUrl.trim() : null,
+  };
+
+  try {
+    await setDoc(getRedeemControlRef(), next, { merge: true });
+    return next;
   } catch (error) {
     throw mapFirebaseError(error);
   }

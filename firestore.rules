@@ -14,29 +14,60 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == uid;
     }
 
+    function isAdmin() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function currentRole() {
+      return isAdmin() ? 'admin' : 'player';
+    }
+
+    function accountMatchesAuth() {
+      return request.auth.token.email is string
+        && request.resource.data.account == request.auth.token.email;
+    }
+
+    function roleMatchesAuth() {
+      return request.resource.data.role == currentRole();
+    }
+
     function hasValidShape() {
       return request.resource.data.keys().hasOnly([
         'score',
         'isRedeemed',
         'redeemTime',
-        'completedStages'
+        'completedStages',
+        'account',
+        'role'
       ])
       && request.resource.data.score is int
       && request.resource.data.isRedeemed is bool
       && (request.resource.data.redeemTime == null || request.resource.data.redeemTime is string)
-      && request.resource.data.completedStages is map;
+      && request.resource.data.completedStages is map
+      && request.resource.data.account is string
+      && request.resource.data.role in ['admin', 'player'];
     }
 
     function isInitialDocument() {
       return hasValidShape()
+        && accountMatchesAuth()
+        && roleMatchesAuth()
         && request.resource.data.score == 0
         && request.resource.data.isRedeemed == false
         && request.resource.data.redeemTime == null
         && request.resource.data.completedStages.size() == 0;
     }
 
+    function redeemIsOpen() {
+      return exists(/databases/$(database)/documents/system/redeemControl)
+        && get(/databases/$(database)/documents/system/redeemControl).data.isOpen == true;
+    }
+
     function isValidProgressUpdate() {
       return hasValidShape()
+        && accountMatchesAuth()
+        && roleMatchesAuth()
         && request.resource.data.score >= resource.data.score
         && request.resource.data.score <= resource.data.score + 1
         && request.resource.data.completedStages.size() >= resource.data.completedStages.size()
@@ -44,7 +75,22 @@ service cloud.firestore {
         && request.resource.data.completedStages.values().hasOnly([true])
         && (
           request.resource.data.isRedeemed == resource.data.isRedeemed
-          || (resource.data.isRedeemed == false && request.resource.data.isRedeemed == true)
+          || (
+            resource.data.isRedeemed == false
+            && request.resource.data.isRedeemed == true
+            && redeemIsOpen()
+          )
+        )
+        && (
+          (
+            request.resource.data.isRedeemed == resource.data.isRedeemed
+            && request.resource.data.redeemTime == resource.data.redeemTime
+          )
+          || (
+            resource.data.isRedeemed == false
+            && request.resource.data.isRedeemed == true
+            && request.resource.data.redeemTime is string
+          )
         );
     }
 
@@ -52,6 +98,17 @@ service cloud.firestore {
       allow read: if isOwner(uid) && isSchoolAccount();
       allow create: if isOwner(uid) && isSchoolAccount() && isInitialDocument();
       allow update: if isOwner(uid) && isSchoolAccount() && isValidProgressUpdate();
+      allow delete: if false;
+    }
+
+    match /admins/{uid} {
+      allow read: if isOwner(uid) && isSchoolAccount();
+      allow write: if false;
+    }
+
+    match /system/redeemControl {
+      allow read: if isSignedIn() && isSchoolAccount();
+      allow create, update: if isAdmin() && isSchoolAccount();
       allow delete: if false;
     }
   }

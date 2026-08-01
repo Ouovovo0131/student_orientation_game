@@ -28,13 +28,23 @@ function ProtectedRoute({ children }: { children: ReactElement }) {
 }
 
 export default function App() {
-  const { player, totalCheckpoints, refreshPlayer, uid, loading, taskMessage, error } = useGame();
+  const {
+    player,
+    totalCheckpoints,
+    refreshPlayer,
+    refreshRedeemControl,
+    uid,
+    loading,
+    taskMessage,
+    error,
+  } = useGame();
 
   useEffect(() => {
     if (uid) {
       void refreshPlayer();
+      void refreshRedeemControl();
     }
-  }, [uid, refreshPlayer]);
+  }, [uid, refreshPlayer, refreshRedeemControl]);
 
   return (
     <div className="min-h-screen bg-neo-paper pb-24">

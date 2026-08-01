@@ -71,3 +71,16 @@
 - 登入帳號是否為 `@hlhs.hlc.edu.tw`
 - Firestore 實際讀寫路徑是否為 `players/{uid}`
 - 規則是否真的已發布到目前使用的 Firebase 專案
+
+## 管理員權限設定
+
+目前角色來源為 Firestore 的 `admins/{uid}`：
+
+- 若存在 `admins/{uid}` 文件，該帳號角色為 `admin`
+- 否則角色為 `player`
+
+建議設定流程：
+
+1. 先使用目標管理員 Google 帳號登入一次，取得對應 uid
+2. 在 Firestore 建立文件 `admins/{uid}`（內容可留空或加註記欄位）
+3. 重新登入後，兌換頁會出現管理員控制台，可開關兌換並設定 QR code 連結
