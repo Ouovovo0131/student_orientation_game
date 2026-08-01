@@ -1,7 +1,6 @@
 import {
-  getRedirectResult,
   GoogleAuthProvider,
-  signInWithRedirect,
+  signInWithPopup,
   signOut,
 } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
@@ -17,7 +16,7 @@ function validateSchoolEmail(email: string | null | undefined): string {
   return normalizedEmail;
 }
 
-export async function schoolLogin(): Promise<string | null> {
+export async function schoolLogin(): Promise<string> {
   const auth = getFirebaseAuth();
   const provider = new GoogleAuthProvider();
   provider.setCustomParameters({ hd: SCHOOL_EMAIL_DOMAIN.slice(1) });
@@ -28,14 +27,9 @@ export async function schoolLogin(): Promise<string | null> {
       return auth.currentUser.uid;
     }
 
-    const redirectResult = await getRedirectResult(auth);
-    if (redirectResult?.user) {
-      validateSchoolEmail(redirectResult.user.email);
-      return redirectResult.user.uid;
-    }
-
-    await signInWithRedirect(auth, provider);
-    return null;
+    const result = await signInWithPopup(auth, provider);
+    validateSchoolEmail(result.user.email);
+    return result.user.uid;
   } catch (error) {
     if (error instanceof FirebaseError) {
       if (error.code === "auth/invalid-api-key") {
@@ -52,8 +46,8 @@ export async function schoolLogin(): Promise<string | null> {
       if (error.code === "auth/unauthorized-domain") {
         throw new Error("目前網域尚未加入 Firebase Auth 授權網域，請檢查 Firebase Console 設定。");
       }
-      if (error.code === "auth/redirect-cancelled-by-user") {
-        throw new Error("你已取消登入流程，請再試一次。");
+      if (error.code === "auth/popup-closed-by-user") {
+        throw new Error("登入視窗已關閉，請重新點擊登入按鈕。");
       }
     }
 
