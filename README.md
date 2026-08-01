@@ -33,3 +33,16 @@
 ## 注意
 
 目前工作環境未安裝 Node.js，因此此提交僅完成程式碼與結構生成，尚未在本機執行 build/test。
+
+## Vercel 部署設定
+
+- Project Settings -> Environment Variables 請設定：
+  - `VITE_FIREBASE_API_KEY`
+  - `VITE_FIREBASE_AUTH_DOMAIN`
+  - `VITE_FIREBASE_PROJECT_ID`
+  - `VITE_FIREBASE_STORAGE_BUCKET`
+  - `VITE_FIREBASE_MESSAGING_SENDER_ID`
+  - `VITE_FIREBASE_APP_ID`
+  - `VITE_API_BASE_URL`（若未設定，正式環境預設走 `/api`）
+- Node.js 版本建議使用 20 以上（已在 `package.json` 設定 `engines`）。
+- 目前 `server/` 是獨立 Express 服務，不會自動被前端 Vercel 靜態部署一併啟動。
