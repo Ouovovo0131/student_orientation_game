@@ -47,8 +47,8 @@ export function GameProvider({ children }: PropsWithChildren) {
     setPlayer(data);
   }, [uid, withTask]);
 
-  const loginWithSchoolAccount = useCallback(async (email: string, password: string) => {
-    const currentUid = await withTask("使用學校帳號登入中", () => schoolLogin(email, password));
+  const loginWithSchoolAccount = useCallback(async () => {
+    const currentUid = await withTask("使用學校帳號登入中", schoolLogin);
     localStorage.setItem("orientation_uid", currentUid);
     setUid(currentUid);
     const state = await withTask("建立玩家初始資料中", () => getPlayerState(currentUid));

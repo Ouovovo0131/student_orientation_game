@@ -1,22 +1,24 @@
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { getFirebaseAuth } from "../firebase/client";
 
 const SCHOOL_EMAIL_DOMAIN = "@hlhs.hlc.edu.tw";
 
-function validateSchoolEmail(email: string): string {
-  const normalizedEmail = email.trim().toLowerCase();
+function validateSchoolEmail(email: string | null | undefined): string {
+  const normalizedEmail = (email ?? "").trim().toLowerCase();
   if (!normalizedEmail.endsWith(SCHOOL_EMAIL_DOMAIN)) {
-    throw new Error(`請使用學校帳號登入，電子郵件必須以 ${SCHOOL_EMAIL_DOMAIN} 結尾。`);
+    throw new Error(`請使用學校帳號登入，Google 帳號必須以 ${SCHOOL_EMAIL_DOMAIN} 結尾。`);
   }
   return normalizedEmail;
 }
 
-export async function schoolLogin(email: string, password: string): Promise<string> {
-  const normalizedEmail = validateSchoolEmail(email);
+export async function schoolLogin(): Promise<string> {
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ hd: SCHOOL_EMAIL_DOMAIN.slice(1) });
 
   try {
-    const result = await signInWithEmailAndPassword(getFirebaseAuth(), normalizedEmail, password);
+    const result = await signInWithPopup(getFirebaseAuth(), provider);
+    validateSchoolEmail(result.user.email);
     return result.user.uid;
   } catch (error) {
     if (error instanceof FirebaseError) {
@@ -28,13 +30,23 @@ export async function schoolLogin(email: string, password: string): Promise<stri
       if (error.code === "auth/configuration-not-found") {
         throw new Error("Firebase Auth 設定不存在，請確認 Firebase 專案已啟用 Authentication。");
       }
-      if (error.code === "auth/invalid-credential" || error.code === "auth/wrong-password") {
-        throw new Error("學校帳號或密碼錯誤，請重新確認後再登入。");
+      if (error.code === "auth/popup-closed-by-user") {
+        throw new Error("登入視窗已關閉，請重新點擊登入按鈕。");
       }
-      if (error.code === "auth/user-not-found") {
-        throw new Error("找不到這個學校帳號，請確認是否已完成 Firebase Authentication 建立。");
+      if (error.code === "auth/account-exists-with-different-credential") {
+        throw new Error("這個學校帳號已用其他登入方式註冊，請確認 Firebase 登入設定。");
+      }
+      if (error.code === "auth/unauthorized-domain") {
+        throw new Error("目前網域尚未加入 Firebase Auth 授權網域，請檢查 Firebase Console 設定。");
       }
     }
+
+    try {
+      await signOut(getFirebaseAuth());
+    } catch {
+      // Ignore sign-out failures during cleanup.
+    }
+
     if (error instanceof Error) {
       throw error;
     }
