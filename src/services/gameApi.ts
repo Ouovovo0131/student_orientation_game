@@ -1,59 +1,142 @@
-import type { ApiEnvelope, PlayerState, StageId } from "../types";
+import { FirebaseError } from "firebase/app";
+import {
+  doc,
+  getDoc,
+  runTransaction,
+  setDoc,
+  type DocumentData,
+} from "firebase/firestore";
+import { CHECKPOINTS } from "../assets/checkpoints";
+import { getFirebaseAuth, getFirebaseDb } from "../firebase/client";
+import type { PlayerState, StageId } from "../types";
 
-const API_BASE =
-  import.meta.env.VITE_API_BASE_URL ??
-  (window.location.hostname === "localhost" ? "http://localhost:8787/api" : "/api");
+const PLAYERS_COLLECTION = "players";
 
-function parseJsonSafe<T>(text: string): ApiEnvelope<T> | null {
-  try {
-    return JSON.parse(text) as ApiEnvelope<T>;
-  } catch {
-    return null;
-  }
+function initialPlayerState(): PlayerState {
+  return {
+    score: 0,
+    isRedeemed: false,
+    redeemTime: null,
+    completedStages: {},
+  };
 }
 
-async function request<T>(path: string, init: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(init.headers ?? {}),
-    },
-  });
+function normalizePlayerState(input: DocumentData | undefined): PlayerState {
+  const data = input ?? {};
+  return {
+    score: Number(data.score ?? 0),
+    isRedeemed: Boolean(data.isRedeemed),
+    redeemTime: typeof data.redeemTime === "string" ? data.redeemTime : null,
+    completedStages:
+      typeof data.completedStages === "object" && data.completedStages
+        ? (data.completedStages as Record<StageId, boolean>)
+        : {},
+  };
+}
 
-  const rawText = await response.text();
-  const payload = parseJsonSafe<T>(rawText);
-
-  if (!payload) {
-    const hint =
-      window.location.hostname === "localhost"
-        ? "請確認本機後端是否已啟動（預設 http://localhost:8787/api）。"
-        : "請確認 Vercel 已設定 VITE_API_BASE_URL 指向可用的後端 API，並重新部署。";
-    throw new Error(
-      `API 回應格式錯誤（非 JSON）。請求網址：${API_BASE}${path}。${hint}`,
-    );
+function mapFirebaseError(error: unknown): Error {
+  if (error instanceof FirebaseError) {
+    if (error.code === "permission-denied") {
+      return new Error("你沒有權限執行此操作，請確認已完成登入且 Firebase 安全規則正確。");
+    }
+    if (error.code === "unavailable") {
+      return new Error("目前無法連線到 Firebase，請稍後再試。");
+    }
   }
+  return error instanceof Error ? error : new Error("系統發生未知錯誤");
+}
 
-  if (!response.ok || !payload.ok || payload.data === undefined) {
-    throw new Error(payload.message || "伺服器回應錯誤，請稍後再試。");
+function getPlayerRef(uid: string) {
+  return doc(getFirebaseDb(), PLAYERS_COLLECTION, uid);
+}
+
+function assertCurrentUser(uid: string) {
+  const currentUid = getFirebaseAuth().currentUser?.uid;
+  if (!currentUid || currentUid !== uid) {
+    throw new Error("登入狀態已失效，請重新登入後再試。");
   }
-
-  return payload.data;
 }
 
 export async function getPlayerState(uid: string): Promise<PlayerState> {
-  return request<PlayerState>(`/players/${uid}`, { method: "GET" });
+  assertCurrentUser(uid);
+  const ref = getPlayerRef(uid);
+
+  try {
+    const snapshot = await getDoc(ref);
+    if (!snapshot.exists()) {
+      const initial = initialPlayerState();
+      await setDoc(ref, initial);
+      return initial;
+    }
+    return normalizePlayerState(snapshot.data());
+  } catch (error) {
+    throw mapFirebaseError(error);
+  }
 }
 
 export async function completeStage(uid: string, stageId: StageId): Promise<PlayerState> {
-  return request<PlayerState>(`/players/${uid}/complete`, {
-    method: "POST",
-    body: JSON.stringify({ stageId }),
-  });
+  assertCurrentUser(uid);
+  const ref = getPlayerRef(uid);
+
+  try {
+    await runTransaction(getFirebaseDb(), async (transaction) => {
+      const snapshot = await transaction.get(ref);
+      const current = normalizePlayerState(snapshot.data());
+
+      if (current.completedStages[stageId]) {
+        return;
+      }
+
+      transaction.set(
+        ref,
+        {
+          score: current.score + 1,
+          completedStages: {
+            ...current.completedStages,
+            [stageId]: true,
+          },
+        },
+        { merge: true },
+      );
+    });
+
+    const next = await getDoc(ref);
+    return normalizePlayerState(next.data());
+  } catch (error) {
+    throw mapFirebaseError(error);
+  }
 }
 
 export async function redeem(uid: string): Promise<PlayerState> {
-  return request<PlayerState>(`/players/${uid}/redeem`, {
-    method: "POST",
-  });
+  assertCurrentUser(uid);
+  const ref = getPlayerRef(uid);
+
+  try {
+    await runTransaction(getFirebaseDb(), async (transaction) => {
+      const snapshot = await transaction.get(ref);
+      const current = normalizePlayerState(snapshot.data());
+
+      if (current.score < CHECKPOINTS.length) {
+        throw new Error("尚未達成全部關卡，無法兌換。");
+      }
+
+      if (current.isRedeemed) {
+        return;
+      }
+
+      transaction.set(
+        ref,
+        {
+          isRedeemed: true,
+          redeemTime: new Date().toISOString(),
+        },
+        { merge: true },
+      );
+    });
+
+    const next = await getDoc(ref);
+    return normalizePlayerState(next.data());
+  } catch (error) {
+    throw mapFirebaseError(error);
+  }
 }

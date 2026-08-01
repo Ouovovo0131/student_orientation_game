@@ -1,5 +1,6 @@
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { getAuth, type Auth } from "firebase/auth";
+import { getFirestore, type Firestore } from "firebase/firestore";
 
 const REQUIRED_ENV_KEYS = [
   "VITE_FIREBASE_API_KEY",
@@ -13,6 +14,7 @@ const REQUIRED_ENV_KEYS = [
 type EnvKey = (typeof REQUIRED_ENV_KEYS)[number];
 
 let cachedAuth: Auth | null = null;
+let cachedDb: Firestore | null = null;
 
 function readEnv(key: EnvKey): string {
   const value = import.meta.env[key];
@@ -44,8 +46,24 @@ export function getFirebaseAuth(): Auth {
     return cachedAuth;
   }
 
+  const app = getFirebaseApp();
+  cachedAuth = getAuth(app);
+  return cachedAuth;
+}
+
+export function getFirebaseDb(): Firestore {
+  if (cachedDb) {
+    return cachedDb;
+  }
+
+  const app = getFirebaseApp();
+  cachedDb = getFirestore(app);
+  return cachedDb;
+}
+
+function getFirebaseApp() {
   const env = assertFirebaseEnv();
-  const app = getApps().length > 0
+  return getApps().length > 0
     ? getApp()
     : initializeApp({
         apiKey: env.VITE_FIREBASE_API_KEY,
@@ -55,7 +73,4 @@ export function getFirebaseAuth(): Auth {
         messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID,
         appId: env.VITE_FIREBASE_APP_ID,
       });
-
-  cachedAuth = getAuth(app);
-  return cachedAuth;
 }

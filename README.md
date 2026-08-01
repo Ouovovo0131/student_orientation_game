@@ -8,6 +8,7 @@
 - 前端使用統一 Neo-Brutalism 設計系統
 - 全站包含中文錯誤訊息與目前任務提示
 - 登入需使用學校帳號，電子郵件必須以 `@hlhs.hlc.edu.tw` 結尾
+- 遊戲資料由前端直接透過 Firestore SDK 存取（不依賴自建後端 API）
 
 ## 啟動步驟
 
@@ -44,7 +45,15 @@
   - `VITE_FIREBASE_STORAGE_BUCKET`
   - `VITE_FIREBASE_MESSAGING_SENDER_ID`
   - `VITE_FIREBASE_APP_ID`
-  - `VITE_API_BASE_URL`（若未設定，正式環境預設走 `/api`）
-- Firebase Authentication 需啟用 Email/Password 登入方式，並已建立對應的學校帳號使用者。
+- Firebase Authentication 請啟用 Google 登入，並限制使用學校網域帳號。
 - Node.js 版本建議使用 20 以上（已在 `package.json` 設定 `engines`）。
-- 目前 `server/` 是獨立 Express 服務，不會自動被前端 Vercel 靜態部署一併啟動。
+- Firebase Authentication 請啟用 Google 登入，並在 Authorized domains 加入你的 Vercel 網域。
+
+## Firestore 安全規則建議
+
+前端直連 Firestore 時，請至少設定以下方向：
+
+- 只允許已登入使用者存取自己的 `players/{uid}`
+- `score` 只能遞增且每次最多 +1
+- `completedStages` 只能新增 `true`，不可回寫 `false`
+- `isRedeemed` 只能由 `false` 變成 `true`
