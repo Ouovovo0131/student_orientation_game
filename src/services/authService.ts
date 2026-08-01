@@ -23,6 +23,11 @@ export async function schoolLogin(): Promise<string | null> {
   provider.setCustomParameters({ hd: SCHOOL_EMAIL_DOMAIN.slice(1) });
 
   try {
+    if (auth.currentUser) {
+      validateSchoolEmail(auth.currentUser.email);
+      return auth.currentUser.uid;
+    }
+
     const redirectResult = await getRedirectResult(auth);
     if (redirectResult?.user) {
       validateSchoolEmail(redirectResult.user.email);
