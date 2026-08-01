@@ -70,7 +70,7 @@ export function GameProvider({ children }: PropsWithChildren) {
     const currentUid = await withTask("使用學校帳號登入中", schoolLogin);
     localStorage.setItem("orientation_uid", currentUid);
     setUid(currentUid);
-    const state = await withTask("建立玩家初始資料中", () => getPlayerState(currentUid));
+    const state = await withTask("登入成功，檢查玩家資料（不存在則自動建立）", () => getPlayerState(currentUid));
     const control = await withTask("同步兌換開放狀態中", () => getRedeemControl(currentUid));
     setPlayer(state);
     setRedeemControlState(control);

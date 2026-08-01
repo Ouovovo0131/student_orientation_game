@@ -93,7 +93,7 @@ async function getCurrentIdentity(expectedUid: string): Promise<CurrentIdentity>
     throw new Error("登入狀態已失效，請重新登入後再試。");
   }
 
-  const email = user.email?.trim().toLowerCase();
+  const email = user.email?.trim();
   if (!email) {
     throw new Error("無法取得登入帳號資訊，請重新登入後再試。");
   }
