@@ -1,11 +1,14 @@
 import {
   createContext,
   useCallback,
+  useEffect,
   useMemo,
   useState,
   type PropsWithChildren,
 } from "react";
+import { onAuthStateChanged } from "firebase/auth";
 import { CHECKPOINTS } from "../assets/checkpoints";
+import { getFirebaseAuth } from "../firebase/client";
 import { schoolLogin, schoolLogout } from "../services/authService";
 import {
   completeStage,
@@ -33,6 +36,27 @@ export function GameProvider({ children }: PropsWithChildren) {
   );
   const [player, setPlayer] = useState<PlayerState | null>(null);
   const [redeemControl, setRedeemControlState] = useState<RedeemControl>(DEFAULT_REDEEM_CONTROL);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(getFirebaseAuth(), (user) => {
+      if (!user) {
+        localStorage.removeItem("orientation_uid");
+        setUid(null);
+        setPlayer(null);
+        setRedeemControlState(DEFAULT_REDEEM_CONTROL);
+        return;
+      }
+
+      if (user.uid !== localStorage.getItem("orientation_uid")) {
+        localStorage.setItem("orientation_uid", user.uid);
+      }
+      setUid(user.uid);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const withTask = useCallback(async <T,>(message: string, action: () => Promise<T>) => {
     setLoading(true);

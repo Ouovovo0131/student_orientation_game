@@ -1,4 +1,5 @@
 import { FirebaseError } from "firebase/app";
+import { onAuthStateChanged, type User } from "firebase/auth";
 import {
   doc,
   getDoc,
@@ -86,9 +87,26 @@ function getRedeemControlRef() {
   return doc(getFirebaseDb(), SYSTEM_COLLECTION, REDEEM_CONTROL_DOCUMENT);
 }
 
+function waitForAuthUser(): Promise<User | null> {
+  const auth = getFirebaseAuth();
+  return new Promise((resolve) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      unsubscribe();
+      resolve(user);
+    });
+  });
+}
+
 async function getCurrentIdentity(expectedUid: string): Promise<CurrentIdentity> {
-  const user = getFirebaseAuth().currentUser;
-  const currentUid = user?.uid;
+  const auth = getFirebaseAuth();
+  let user = auth.currentUser;
+  let currentUid = user?.uid;
+
+  if (!currentUid || currentUid !== expectedUid) {
+    user = await waitForAuthUser();
+    currentUid = user?.uid;
+  }
+
   if (!currentUid || currentUid !== expectedUid) {
     throw new Error("登入狀態已失效，請重新登入後再試。");
   }

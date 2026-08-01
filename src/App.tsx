@@ -40,10 +40,18 @@ export default function App() {
   } = useGame();
 
   useEffect(() => {
-    if (uid) {
-      void refreshPlayer();
-      void refreshRedeemControl();
+    if (!uid) {
+      return;
     }
+
+    void (async () => {
+      try {
+        await refreshPlayer();
+        await refreshRedeemControl();
+      } catch {
+        // 錯誤訊息已在 GameContext 設定，此處避免未捕捉 Promise 例外。
+      }
+    })();
   }, [uid, refreshPlayer, refreshRedeemControl]);
 
   return (
