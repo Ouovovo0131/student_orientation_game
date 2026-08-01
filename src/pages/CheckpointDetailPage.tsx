@@ -1,0 +1,49 @@
+import { ArrowRight } from "lucide-react";
+import { Link, useParams } from "react-router-dom";
+import { PageContainer } from "../components/layout/PageContainer";
+import { NeoBadge } from "../components/ui/NeoBadge";
+import { NeoButton } from "../components/ui/NeoButton";
+import { NeoCard } from "../components/ui/NeoCard";
+import { useCheckpoint } from "../hooks/useCheckpoint";
+import { useGame } from "../hooks/useGame";
+
+export function CheckpointDetailPage() {
+  const { id } = useParams();
+  const checkpoint = useCheckpoint(id);
+  const { player } = useGame();
+
+  if (!checkpoint) {
+    return (
+      <PageContainer>
+        <NeoCard>
+          <h1 className="text-2xl font-black">找不到關卡</h1>
+          <p className="mt-2">請回到關卡列表重新選擇。</p>
+        </NeoCard>
+      </PageContainer>
+    );
+  }
+
+  const completed = Boolean(player?.completedStages[checkpoint.id]);
+
+  return (
+    <PageContainer className="max-w-3xl">
+      <NeoCard>
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="text-3xl font-black">{checkpoint.title}</h1>
+          <NeoBadge tone={completed ? "success" : "warning"}>
+            {completed ? "已完成" : "待完成"}
+          </NeoBadge>
+        </div>
+        <p className="mt-4 text-base">{checkpoint.description}</p>
+        <p className="mt-4 border-l-4 border-black bg-[#8DD8FF] p-3 text-sm font-bold">
+          分數規則：影片完整播放至結尾後，系統才會自動提交完成，不可手動領分。
+        </p>
+        <Link to={`/video/${checkpoint.id}`} className="mt-6 inline-block">
+          <NeoButton>
+            進入影片闖關 <ArrowRight className="ml-1 inline" size={18} />
+          </NeoButton>
+        </Link>
+      </NeoCard>
+    </PageContainer>
+  );
+}

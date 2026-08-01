@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Space Grotesk", sans-serif;
+  color: #111111;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 20% 10%, #ffd644 0 18%, transparent 19%),
+    radial-gradient(circle at 85% 20%, #8dd8ff 0 15%, transparent 16%),
+    radial-gradient(circle at 10% 90%, #3bea7d 0 13%, transparent 14%),
+    #fff6d6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.bg-neo-paper {
+  background:
+    linear-gradient(110deg, rgba(255, 255, 255, 0.6) 0 30%, transparent 30% 100%),
+    #fff6d6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
