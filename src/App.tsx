@@ -14,6 +14,7 @@ import { LandingPage } from "./pages/LandingPage";
 import { LoadingPage } from "./pages/LoadingPage";
 import { LoginPage } from "./pages/LoginPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
+import { RedeemManagementPage } from "./pages/RedeemManagementPage";
 import { RedeemPage } from "./pages/RedeemPage";
 import { VideoPage } from "./pages/VideoPage";
 
@@ -110,6 +111,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <RedeemPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/redeem"
+          element={
+            <ProtectedRoute>
+              <RedeemManagementPage />
             </ProtectedRoute>
           }
         />

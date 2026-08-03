@@ -22,6 +22,14 @@ export interface RedeemControl {
   qrCodeUrl: string | null;
 }
 
+export interface RedeemStats {
+  totalPlayers: number;
+  eligiblePlayers: number;
+  ineligiblePlayers: number;
+  redeemedPlayers: number;
+  waitingRedeemPlayers: number;
+}
+
 export interface UserSession {
   uid: string;
 }

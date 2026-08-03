@@ -91,7 +91,7 @@ service cloud.firestore {
     }
 
     match /players/{uid} {
-      allow read: if isOwner(uid) && isSchoolAccount();
+      allow read: if (isOwner(uid) || isAdmin()) && isSchoolAccount();
       allow create: if isOwner(uid) && isSchoolAccount() && isInitialDocument();
       allow update: if isOwner(uid) && isSchoolAccount() && isValidProgressUpdate();
       allow delete: if false;

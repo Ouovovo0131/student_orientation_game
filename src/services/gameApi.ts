@@ -1,15 +1,17 @@
 import { FirebaseError } from "firebase/app";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import {
+  collection,
   doc,
   getDoc,
+  getDocs,
   runTransaction,
   setDoc,
   type DocumentData,
 } from "firebase/firestore";
 import { CHECKPOINTS } from "../assets/checkpoints";
 import { getFirebaseAuth, getFirebaseDb } from "../firebase/client";
-import type { PlayerRole, PlayerState, RedeemControl, StageId } from "../types";
+import type { PlayerRole, PlayerState, RedeemControl, RedeemStats, StageId } from "../types";
 
 const PLAYERS_COLLECTION = "players";
 const ADMINS_COLLECTION = "admins";
@@ -263,6 +265,53 @@ export async function updateRedeemControl(uid: string, payload: RedeemControl): 
   try {
     await setDoc(getRedeemControlRef(), next, { merge: true });
     return next;
+  } catch (error) {
+    throw mapFirebaseError(error);
+  }
+}
+
+export async function getRedeemStats(uid: string, totalCheckpoints: number): Promise<RedeemStats> {
+  const identity = await getCurrentIdentity(uid);
+  if (identity.role !== "admin") {
+    throw new Error("只有管理員可以查看兌換統計。");
+  }
+
+  try {
+    const snapshot = await getDocs(collection(getFirebaseDb(), PLAYERS_COLLECTION));
+    let totalPlayers = 0;
+    let eligiblePlayers = 0;
+    let ineligiblePlayers = 0;
+    let redeemedPlayers = 0;
+    let waitingRedeemPlayers = 0;
+
+    snapshot.forEach((docSnapshot) => {
+      const state = normalizePlayerState(docSnapshot.data());
+      if (state.role !== "player") {
+        return;
+      }
+
+      totalPlayers += 1;
+
+      if (state.score >= totalCheckpoints) {
+        eligiblePlayers += 1;
+      } else {
+        ineligiblePlayers += 1;
+      }
+
+      if (state.isRedeemed) {
+        redeemedPlayers += 1;
+      } else if (state.score >= totalCheckpoints) {
+        waitingRedeemPlayers += 1;
+      }
+    });
+
+    return {
+      totalPlayers,
+      eligiblePlayers,
+      ineligiblePlayers,
+      redeemedPlayers,
+      waitingRedeemPlayers,
+    };
   } catch (error) {
     throw mapFirebaseError(error);
   }

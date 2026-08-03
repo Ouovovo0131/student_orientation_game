@@ -24,9 +24,9 @@ export function TopNavigation({ score, total }: TopNavigationProps) {
         <div className="flex items-center gap-3">
           <NeoBadge tone="info">分數 {score} / {total}</NeoBadge>
           {uid && isAdmin && (
-            <Link to="/redeem">
+            <Link to="/admin/redeem">
               <NeoButton variant="primary" className="min-h-0 px-3 py-2 text-sm">
-                前往兌換頁
+                兌換管理
               </NeoButton>
             </Link>
           )}
