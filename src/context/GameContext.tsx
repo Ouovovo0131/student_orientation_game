@@ -14,6 +14,7 @@ import {
   completeStage,
   getPlayerState,
   getRedeemControl,
+  requestRedeemTicket,
   redeem,
   updateRedeemControl,
 } from "../services/gameApi";
@@ -135,6 +136,14 @@ export function GameProvider({ children }: PropsWithChildren) {
     setPlayer(state);
   }, [uid, withTask]);
 
+  const requestRedeem = useCallback(async () => {
+    if (!uid) {
+      throw new Error("尚未登入，無法提出兌換請求。請先登入。");
+    }
+    const state = await withTask("正在通知管理員可兌換名單", () => requestRedeemTicket(uid));
+    setPlayer(state);
+  }, [uid, withTask]);
+
   const value = useMemo<GameContextValue>(
     () => ({
       loading,
@@ -150,6 +159,7 @@ export function GameProvider({ children }: PropsWithChildren) {
       refreshRedeemControl,
       setRedeemControl,
       completeCheckpoint,
+      requestRedeemTicket: requestRedeem,
       redeemReward,
     }),
     [
@@ -165,6 +175,7 @@ export function GameProvider({ children }: PropsWithChildren) {
       refreshRedeemControl,
       setRedeemControl,
       completeCheckpoint,
+      requestRedeem,
       redeemReward,
     ],
   );

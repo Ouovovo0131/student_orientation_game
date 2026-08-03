@@ -15,6 +15,7 @@ const EMPTY_STATS: RedeemStats = {
   ineligiblePlayers: 0,
   redeemedPlayers: 0,
   waitingRedeemPlayers: 0,
+  requestedAccounts: [],
 };
 
 export function RedeemManagementPage() {
@@ -75,9 +76,9 @@ export function RedeemManagementPage() {
       <NeoCard className="mt-4">
         <h2 className="text-2xl font-black">開啟兌換會有什麼效果？</h2>
         <div className="mt-3 space-y-2 text-sm">
-          <p>1. 玩家在兌換頁面會看到「可執行兌換」按鈕。</p>
-          <p>2. 玩家若已完成全部關卡，可由工作人員引導完成兌換確認。</p>
-          <p>3. 關閉兌換後，玩家仍可看到說明與 QR Code，但無法送出兌換。</p>
+          <p>1. 玩家在兌換頁面會看到可兌換判定與提示動畫。</p>
+          <p>2. 玩家達標後可按「通知管理員：我可兌換」，帳號會進入下方名單。</p>
+          <p>3. 關閉兌換後，玩家會顯示不可兌換狀態，無法送出通知。</p>
         </div>
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <NeoBadge tone={redeemControl.isOpen ? "success" : "warning"}>
@@ -138,6 +139,20 @@ export function RedeemManagementPage() {
           <NeoBadge tone="warning">無法兌獎人數：{stats.ineligiblePlayers}</NeoBadge>
           <NeoBadge tone="info">已兌獎人數：{stats.redeemedPlayers}</NeoBadge>
           <NeoBadge tone="success">待兌獎人數：{stats.waitingRedeemPlayers}</NeoBadge>
+        </div>
+        <div className="mt-5 border-4 border-black bg-white p-4">
+          <h3 className="text-lg font-black">已送出可兌換通知的帳號</h3>
+          {stats.requestedAccounts.length === 0 ? (
+            <p className="mt-2 text-sm">目前尚無玩家送出可兌換通知。</p>
+          ) : (
+            <ul className="mt-3 space-y-2 text-sm font-bold">
+              {stats.requestedAccounts.map((account) => (
+                <li key={account} className="border-2 border-black bg-[#FFF8E8] px-3 py-2">
+                  {account}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </NeoCard>
     </PageContainer>

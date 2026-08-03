@@ -12,6 +12,8 @@ export interface PlayerState {
   score: number;
   isRedeemed: boolean;
   redeemTime: string | null;
+  redeemRequested: boolean;
+  redeemRequestTime: string | null;
   completedStages: Record<StageId, boolean>;
   account: string;
   role: PlayerRole;
@@ -28,6 +30,7 @@ export interface RedeemStats {
   ineligiblePlayers: number;
   redeemedPlayers: number;
   waitingRedeemPlayers: number;
+  requestedAccounts: string[];
 }
 
 export interface UserSession {
@@ -48,6 +51,7 @@ export interface GameContextValue {
   refreshRedeemControl: () => Promise<void>;
   setRedeemControl: (payload: RedeemControl) => Promise<void>;
   completeCheckpoint: (stageId: StageId) => Promise<void>;
+  requestRedeemTicket: () => Promise<void>;
   redeemReward: () => Promise<void>;
 }
 

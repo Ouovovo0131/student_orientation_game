@@ -42,6 +42,8 @@ service cloud.firestore {
         'score',
         'isRedeemed',
         'redeemTime',
+        'redeemRequested',
+        'redeemRequestTime',
         'completedStages',
         'account',
         'role'
@@ -49,6 +51,8 @@ service cloud.firestore {
       && request.resource.data.score is int
       && request.resource.data.isRedeemed is bool
       && (request.resource.data.redeemTime == null || request.resource.data.redeemTime is string)
+      && request.resource.data.redeemRequested is bool
+      && (request.resource.data.redeemRequestTime == null || request.resource.data.redeemRequestTime is string)
       && request.resource.data.completedStages is map
       && request.resource.data.account is string
       && request.resource.data.role in ['admin', 'player'];
@@ -60,6 +64,8 @@ service cloud.firestore {
         && request.resource.data.score == 0
         && request.resource.data.isRedeemed == false
         && request.resource.data.redeemTime == null
+        && request.resource.data.redeemRequested == false
+        && request.resource.data.redeemRequestTime == null
         && request.resource.data.completedStages.size() == 0;
     }
 
@@ -85,6 +91,20 @@ service cloud.firestore {
           )
         )
         && (
+          request.resource.data.redeemRequested == resource.data.redeemRequested
+          || (
+            resource.data.redeemRequested == false
+            && request.resource.data.redeemRequested == true
+            && redeemIsOpen()
+          )
+          || (
+            resource.data.isRedeemed == false
+            && request.resource.data.isRedeemed == true
+            && resource.data.redeemRequested == true
+            && request.resource.data.redeemRequested == false
+          )
+        )
+        && (
           (
             request.resource.data.isRedeemed == resource.data.isRedeemed
             && request.resource.data.redeemTime == resource.data.redeemTime
@@ -93,6 +113,22 @@ service cloud.firestore {
             resource.data.isRedeemed == false
             && request.resource.data.isRedeemed == true
             && request.resource.data.redeemTime is string
+          )
+        )
+        && (
+          (
+            request.resource.data.redeemRequested == resource.data.redeemRequested
+            && request.resource.data.redeemRequestTime == resource.data.redeemRequestTime
+          )
+          || (
+            resource.data.redeemRequested == false
+            && request.resource.data.redeemRequested == true
+            && request.resource.data.redeemRequestTime is string
+          )
+          || (
+            resource.data.isRedeemed == false
+            && request.resource.data.isRedeemed == true
+            && request.resource.data.redeemRequested == false
           )
         );
     }

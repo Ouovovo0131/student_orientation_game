@@ -35,6 +35,8 @@ function initialPlayerState(identity: CurrentIdentity): PlayerState {
     score: 0,
     isRedeemed: false,
     redeemTime: null,
+    redeemRequested: false,
+    redeemRequestTime: null,
     completedStages: {},
     account: identity.email,
     role: identity.role,
@@ -47,6 +49,8 @@ function normalizePlayerState(input: DocumentData | undefined): PlayerState {
     score: Number(data.score ?? 0),
     isRedeemed: Boolean(data.isRedeemed),
     redeemTime: typeof data.redeemTime === "string" ? data.redeemTime : null,
+    redeemRequested: Boolean(data.redeemRequested),
+    redeemRequestTime: typeof data.redeemRequestTime === "string" ? data.redeemRequestTime : null,
     completedStages:
       typeof data.completedStages === "object" && data.completedStages
         ? (data.completedStages as Record<StageId, boolean>)
@@ -147,7 +151,16 @@ export async function getPlayerState(uid: string): Promise<PlayerState> {
     }
 
     const data = normalizePlayerState(snapshot.data());
-    if (data.account !== identity.email || data.role !== identity.role) {
+    if (
+      data.account !== identity.email
+      || data.role !== identity.role
+      || typeof snapshot.data()?.redeemRequested !== "boolean"
+      || (
+        snapshot.data()?.redeemRequestTime !== null
+        && typeof snapshot.data()?.redeemRequestTime !== "string"
+        && typeof snapshot.data()?.redeemRequestTime !== "undefined"
+      )
+    ) {
       const next = {
         ...data,
         account: identity.email,
@@ -225,6 +238,48 @@ export async function redeem(uid: string): Promise<PlayerState> {
         {
           isRedeemed: true,
           redeemTime: new Date().toISOString(),
+          redeemRequested: false,
+        },
+        { merge: true },
+      );
+    });
+
+    const next = await getDoc(ref);
+    return normalizePlayerState(next.data());
+  } catch (error) {
+    throw mapFirebaseError(error);
+  }
+}
+
+export async function requestRedeemTicket(uid: string): Promise<PlayerState> {
+  await getCurrentIdentity(uid);
+  const ref = getPlayerRef(uid);
+  const controlRef = getRedeemControlRef();
+
+  try {
+    await runTransaction(getFirebaseDb(), async (transaction) => {
+      const snapshot = await transaction.get(ref);
+      const current = normalizePlayerState(snapshot.data());
+      const controlSnapshot = await transaction.get(controlRef);
+      const control = normalizeRedeemControl(controlSnapshot.data());
+
+      if (!control.isOpen) {
+        throw new Error("兌換尚未開放，請先由管理員開啟兌換。");
+      }
+
+      if (current.score < CHECKPOINTS.length) {
+        throw new Error("尚未達成全部關卡，目前不可提出兌換請求。");
+      }
+
+      if (current.isRedeemed || current.redeemRequested) {
+        return;
+      }
+
+      transaction.set(
+        ref,
+        {
+          redeemRequested: true,
+          redeemRequestTime: new Date().toISOString(),
         },
         { merge: true },
       );
@@ -283,6 +338,7 @@ export async function getRedeemStats(uid: string, totalCheckpoints: number): Pro
     let ineligiblePlayers = 0;
     let redeemedPlayers = 0;
     let waitingRedeemPlayers = 0;
+    const requestedAccounts: string[] = [];
 
     snapshot.forEach((docSnapshot) => {
       const state = normalizePlayerState(docSnapshot.data());
@@ -303,7 +359,13 @@ export async function getRedeemStats(uid: string, totalCheckpoints: number): Pro
       } else if (state.score >= totalCheckpoints) {
         waitingRedeemPlayers += 1;
       }
+
+      if (state.redeemRequested && !state.isRedeemed) {
+        requestedAccounts.push(state.account || docSnapshot.id);
+      }
     });
+
+    requestedAccounts.sort((a, b) => a.localeCompare(b));
 
     return {
       totalPlayers,
@@ -311,6 +373,7 @@ export async function getRedeemStats(uid: string, totalCheckpoints: number): Pro
       ineligiblePlayers,
       redeemedPlayers,
       waitingRedeemPlayers,
+      requestedAccounts,
     };
   } catch (error) {
     throw mapFirebaseError(error);
