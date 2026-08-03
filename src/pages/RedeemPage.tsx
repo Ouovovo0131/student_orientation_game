@@ -48,11 +48,11 @@ export function RedeemPage() {
         <NeoCard className="bg-[#E8F2FF]">
           <h1 className="text-3xl font-black">這是玩家兌換頁面</h1>
           <p className="mt-3 text-base">
-            管理員請改用獨立的兌換管理頁面進行開關、QR 設定與統計查閱。
+            請改到兌換工作台進行開關、設定與名單查閱。
           </p>
           <div className="mt-6">
             <Link to="/admin/redeem">
-              <NeoButton>前往管理兌換頁</NeoButton>
+              <NeoButton>前往兌換工作台</NeoButton>
             </Link>
           </div>
         </NeoCard>
@@ -67,8 +67,8 @@ export function RedeemPage() {
           <h1 className="text-3xl font-black">目前不可兌換</h1>
           <p className="mt-3 text-base">
             {!eligible
-              ? "你尚未完成全部關卡，完成後系統會自動顯示可兌換狀態。"
-              : "管理員尚未開啟兌換，請稍後再回來查看。"}
+              ? "你還差一點點，完成全部關卡後就會顯示可兌換。"
+              : "兌換時段尚未開始，請稍後再回來看看。"}
           </p>
         </NeoCard>
       )}
@@ -91,17 +91,9 @@ export function RedeemPage() {
             <h1 className="relative text-3xl font-black">你可以兌換獎品了</h1>
             <p className="relative mt-3 text-base">
               {requested
-                ? "已送出可兌換通知，請向工作人員出示此畫面。"
-                : "系統已判定你可兌換，請按下按鈕通知管理員你的帳號。"}
+                ? "已送出兌換通知，請向現場人員出示此畫面。"
+                : "請按下方按鈕進行兌換。"}
             </p>
-
-            {redeemControl.qrCodeUrl && (
-              <img
-                src={redeemControl.qrCodeUrl}
-                alt="兌換 QR Code"
-                className="relative mt-4 w-full max-w-xs border-4 border-black bg-white p-2"
-              />
-            )}
           </div>
 
           {!requested && showRequestButton && (
@@ -113,14 +105,14 @@ export function RedeemPage() {
                   await requestRedeemTicket();
                 }}
               >
-                {loading ? "通知中..." : "通知管理員：我可兌換"}
+                {loading ? "送出中..." : "我要兌換獎品"}
               </NeoButton>
             </div>
           )}
 
           {requested && (
             <div className="mt-4 border-4 border-black bg-[#3BEA7D] p-3 text-center text-base font-black">
-              已通知管理員，請等待叫號或人工核對。
+              兌換通知已送出，請等待現場人員引導。
             </div>
           )}
         </NeoCard>
