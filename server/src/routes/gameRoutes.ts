@@ -7,7 +7,7 @@ import {
 
 const router = Router();
 
-const TOTAL_CHECKPOINTS = Number(process.env.TOTAL_CHECKPOINTS ?? 3);
+const TOTAL_CHECKPOINTS = Number(process.env.TOTAL_CHECKPOINTS ?? 8);
 
 router.get("/players/:uid", async (req, res) => {
   try {

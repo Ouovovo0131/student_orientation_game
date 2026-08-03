@@ -74,6 +74,18 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/system/redeemControl).data.isOpen == true;
     }
 
+    function currentRedeemRequested() {
+      return resource.data.keys().hasAny(['redeemRequested'])
+        ? resource.data.redeemRequested
+        : false;
+    }
+
+    function currentRedeemRequestTime() {
+      return resource.data.keys().hasAny(['redeemRequestTime'])
+        ? resource.data.redeemRequestTime
+        : null;
+    }
+
     function isValidProgressUpdate() {
       return hasValidShape()
         && roleMatchesAuth()
@@ -91,16 +103,16 @@ service cloud.firestore {
           )
         )
         && (
-          request.resource.data.redeemRequested == resource.data.redeemRequested
+          request.resource.data.redeemRequested == currentRedeemRequested()
           || (
-            resource.data.redeemRequested == false
+            currentRedeemRequested() == false
             && request.resource.data.redeemRequested == true
             && redeemIsOpen()
           )
           || (
             resource.data.isRedeemed == false
             && request.resource.data.isRedeemed == true
-            && resource.data.redeemRequested == true
+            currentRedeemRequested() == true
             && request.resource.data.redeemRequested == false
           )
         )
@@ -117,11 +129,11 @@ service cloud.firestore {
         )
         && (
           (
-            request.resource.data.redeemRequested == resource.data.redeemRequested
-            && request.resource.data.redeemRequestTime == resource.data.redeemRequestTime
+            request.resource.data.redeemRequested == currentRedeemRequested()
+            && request.resource.data.redeemRequestTime == currentRedeemRequestTime()
           )
           || (
-            resource.data.redeemRequested == false
+            currentRedeemRequested() == false
             && request.resource.data.redeemRequested == true
             && request.resource.data.redeemRequestTime is string
           )
