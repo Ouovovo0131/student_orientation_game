@@ -91,7 +91,7 @@ export function RedeemPage() {
             <h1 className="relative text-3xl font-black">你可以兌換獎品了</h1>
             <p className="relative mt-3 text-base">
               {requested
-                ? "已送出兌換通知，請向現場人員出示此畫面。"
+                ? "已送出兌換通知，請等待現場人員引導。"
                 : "請按下方按鈕進行兌換。"}
             </p>
           </div>
