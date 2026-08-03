@@ -5,9 +5,16 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function isTestPlayerAccount() {
+      return request.auth.token.email == 'cheiling0131@gmail.com';
+    }
+
     function isSchoolAccount() {
       return request.auth.token.email is string
-        && request.auth.token.email.matches('^[^@]+@hlhs\\.hlc\\.edu\\.tw$');
+        && (
+          request.auth.token.email.matches('^[^@]+@hlhs\\.hlc\\.edu\\.tw$')
+          || isTestPlayerAccount()
+        );
     }
 
     function isOwner(uid) {

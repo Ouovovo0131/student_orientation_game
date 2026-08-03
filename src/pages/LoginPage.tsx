@@ -10,6 +10,7 @@ export function LoginPage() {
   const { loginWithSchoolAccount, loading, uid } = useGame();
 
   const schoolDomain = "@hlhs.hlc.edu.tw";
+  const testAccount = "cheiling0131@gmail.com";
 
   useEffect(() => {
     if (uid) {
@@ -22,11 +23,12 @@ export function LoginPage() {
       <NeoCard>
         <h1 className="text-3xl font-black">Google 學校帳號登入</h1>
         <p className="mt-3 text-sm">
-          請使用你的學校 Google 帳號登入，電子郵件必須以 {schoolDomain} 結尾。登入後，系統會在 Firestore 建立你的闖關記錄。
+          請使用你的學校 Google 帳號登入，電子郵件必須以 {schoolDomain} 結尾。
+          若為測試用途，也可使用指定帳號 {testAccount}。登入後，系統會在 Firestore 建立你的闖關記錄。
         </p>
         <div className="mt-6 space-y-4">
           <p className="rounded-2xl border-4 border-black bg-[#FFF8E8] p-4 text-sm font-bold shadow-[4px_4px_0_0_#000]">
-            系統只接受學校 Google 帳號，登入後會自動檢查是否為 {schoolDomain}。
+            點擊登入後會強制顯示 Google 帳號選擇器，方便你在不同帳號間切換。
           </p>
           <NeoButton
             fullWidth

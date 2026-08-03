@@ -7,11 +7,14 @@ import { FirebaseError } from "firebase/app";
 import { getFirebaseAuth } from "../firebase/client";
 
 const SCHOOL_EMAIL_DOMAIN = "@hlhs.hlc.edu.tw";
+const TEST_PLAYER_EMAIL = "cheiling0131@gmail.com";
 
 function validateSchoolEmail(email: string | null | undefined): string {
   const normalizedEmail = (email ?? "").trim().toLowerCase();
-  if (!normalizedEmail.endsWith(SCHOOL_EMAIL_DOMAIN)) {
-    throw new Error(`請使用學校帳號登入，Google 帳號必須以 ${SCHOOL_EMAIL_DOMAIN} 結尾。`);
+  if (!normalizedEmail.endsWith(SCHOOL_EMAIL_DOMAIN) && normalizedEmail !== TEST_PLAYER_EMAIL) {
+    throw new Error(
+      `請使用學校帳號登入（${SCHOOL_EMAIL_DOMAIN}），或使用指定測試帳號 ${TEST_PLAYER_EMAIL}。`,
+    );
   }
   return normalizedEmail;
 }
@@ -19,14 +22,12 @@ function validateSchoolEmail(email: string | null | undefined): string {
 export async function schoolLogin(): Promise<string> {
   const auth = getFirebaseAuth();
   const provider = new GoogleAuthProvider();
-  provider.setCustomParameters({ hd: SCHOOL_EMAIL_DOMAIN.slice(1) });
+  provider.setCustomParameters({
+    hd: SCHOOL_EMAIL_DOMAIN.slice(1),
+    prompt: "select_account",
+  });
 
   try {
-    if (auth.currentUser) {
-      validateSchoolEmail(auth.currentUser.email);
-      return auth.currentUser.uid;
-    }
-
     const result = await signInWithPopup(auth, provider);
     validateSchoolEmail(result.user.email);
     return result.user.uid;
