@@ -112,7 +112,7 @@ service cloud.firestore {
           || (
             resource.data.isRedeemed == false
             && request.resource.data.isRedeemed == true
-            currentRedeemRequested() == true
+            && currentRedeemRequested() == true
             && request.resource.data.redeemRequested == false
           )
         )
