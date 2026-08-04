@@ -48,7 +48,8 @@ export function CheckpointManagementPage() {
       await setCheckpointAccess(uid, targetUid.trim(), stageIds, { completed: markCompleted });
       setMessage(`已成功更新 ${stageIds.length} 個關卡的權限。`);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "更新失敗，請稍後再試。);
+      setMessage(error instanceof Error ? error.message : "更新失敗，請稍後再試。"
+      );
     } finally {
       setLoading(false);
     }

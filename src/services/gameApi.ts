@@ -355,12 +355,12 @@ export async function setCheckpointAccess(
 ): Promise<PlayerState> {
   const identity = await getCurrentIdentity(adminUid);
   if (identity.role !== "admin") {
-    throw new Error("只有管理員可以管理關卡解鎖。);
+    throw new Error("只有管理員可以管理關卡解鎖。" );
   }
 
   const normalizedStageIds = Array.from(new Set(stageIds.filter(Boolean)));
   if (normalizedStageIds.length === 0) {
-    throw new Error("請至少選擇一個關卡。);
+    throw new Error("請至少選擇一個關卡。" );
   }
 
   const ref = getPlayerRef(targetUid);
