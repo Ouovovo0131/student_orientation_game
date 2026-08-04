@@ -15,6 +15,7 @@ import { LandingPage } from "./pages/LandingPage";
 import { LoadingPage } from "./pages/LoadingPage";
 import { LoginPage } from "./pages/LoginPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
+import { QuizPage } from "./pages/QuizPage";
 import { RedeemManagementPage } from "./pages/RedeemManagementPage";
 import { RedeemPage } from "./pages/RedeemPage";
 import { VideoPage } from "./pages/VideoPage";
@@ -88,6 +89,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <VideoPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/quiz/:id"
+          element={
+            <ProtectedRoute>
+              <QuizPage />
             </ProtectedRoute>
           }
         />
