@@ -1,14 +1,20 @@
 import { motion, useReducedMotion } from "framer-motion";
+import { useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { BottomActionBar } from "../components/layout/BottomActionBar";
 import { PageContainer } from "../components/layout/PageContainer";
 import { NeoButton } from "../components/ui/NeoButton";
 import { NeoCard } from "../components/ui/NeoCard";
+import { launchCelebrationConfetti } from "../utils/confetti";
 
 export function CompletionAnimationPage() {
   const [search] = useSearchParams();
   const stage = search.get("stage") ?? "關卡";
   const reduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    launchCelebrationConfetti();
+  }, []);
 
   return (
     <>

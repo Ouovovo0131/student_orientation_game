@@ -1,11 +1,10 @@
-import { useEffect } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { PageContainer } from "../components/layout/PageContainer";
 import { NeoButton } from "../components/ui/NeoButton";
 import { NeoCard } from "../components/ui/NeoCard";
 import { useGame } from "../hooks/useGame";
-import { useState } from "react";
+import { launchCelebrationConfetti } from "../utils/confetti";
 
 export function RedeemPage() {
   const navigate = useNavigate();
@@ -103,6 +102,7 @@ export function RedeemPage() {
                 disabled={loading}
                 onClick={async () => {
                   await requestRedeemTicket();
+                  launchCelebrationConfetti();
                 }}
               >
                 {loading ? "送出中..." : "我要兌換獎品"}
