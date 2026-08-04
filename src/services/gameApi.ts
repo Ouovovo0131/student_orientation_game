@@ -38,6 +38,7 @@ function initialPlayerState(identity: CurrentIdentity): PlayerState {
     redeemRequested: false,
     redeemRequestTime: null,
     completedStages: {},
+    unlockedStages: {},
     account: identity.email,
     role: identity.role,
   };
@@ -54,6 +55,10 @@ function normalizePlayerState(input: DocumentData | undefined): PlayerState {
     completedStages:
       typeof data.completedStages === "object" && data.completedStages
         ? (data.completedStages as Record<StageId, boolean>)
+        : {},
+    unlockedStages:
+      typeof data.unlockedStages === "object" && data.unlockedStages
+        ? (data.unlockedStages as Record<StageId, boolean>)
         : {},
     account: typeof data.account === "string" ? data.account : "",
     role: data.role === "admin" ? "admin" : "player",
@@ -176,6 +181,12 @@ export async function getPlayerState(uid: string): Promise<PlayerState> {
   }
 }
 
+function getNextStageId(stageId: StageId): StageId | null {
+  const index = CHECKPOINTS.findIndex((checkpoint) => checkpoint.id === stageId);
+  const nextCheckpoint = CHECKPOINTS[index + 1];
+  return nextCheckpoint?.id ?? null;
+}
+
 export async function completeStage(uid: string, stageId: StageId): Promise<PlayerState> {
   await getCurrentIdentity(uid);
   const ref = getPlayerRef(uid);
@@ -189,14 +200,25 @@ export async function completeStage(uid: string, stageId: StageId): Promise<Play
         return;
       }
 
+      const nextCompletedStages = {
+        ...current.completedStages,
+        [stageId]: true,
+      };
+      const nextUnlockedStages = {
+        ...current.unlockedStages,
+      };
+
+      const nextStageId = getNextStageId(stageId);
+      if (nextStageId) {
+        nextUnlockedStages[nextStageId] = true;
+      }
+
       transaction.set(
         ref,
         {
-          score: current.score + 1,
-          completedStages: {
-            ...current.completedStages,
-            [stageId]: true,
-          },
+          score: Object.values(nextCompletedStages).filter(Boolean).length,
+          completedStages: nextCompletedStages,
+          unlockedStages: nextUnlockedStages,
         },
         { merge: true },
       );
@@ -320,6 +342,59 @@ export async function updateRedeemControl(uid: string, payload: RedeemControl): 
   try {
     await setDoc(getRedeemControlRef(), next, { merge: true });
     return next;
+  } catch (error) {
+    throw mapFirebaseError(error);
+  }
+}
+
+export async function setCheckpointAccess(
+  adminUid: string,
+  targetUid: string,
+  stageIds: StageId[],
+  options: { unlocked?: boolean; completed?: boolean } = {},
+): Promise<PlayerState> {
+  const identity = await getCurrentIdentity(adminUid);
+  if (identity.role !== "admin") {
+    throw new Error("只有管理員可以管理關卡解鎖。);
+  }
+
+  const normalizedStageIds = Array.from(new Set(stageIds.filter(Boolean)));
+  if (normalizedStageIds.length === 0) {
+    throw new Error("請至少選擇一個關卡。);
+  }
+
+  const ref = getPlayerRef(targetUid);
+
+  try {
+    await runTransaction(getFirebaseDb(), async (transaction) => {
+      const snapshot = await transaction.get(ref);
+      const current = normalizePlayerState(snapshot.data());
+      const nextUnlockedStages = { ...current.unlockedStages };
+      const nextCompletedStages = { ...current.completedStages };
+
+      normalizedStageIds.forEach((stageId) => {
+        if (options.unlocked !== false) {
+          nextUnlockedStages[stageId] = true;
+        }
+
+        if (options.completed) {
+          nextCompletedStages[stageId] = true;
+        }
+      });
+
+      transaction.set(
+        ref,
+        {
+          unlockedStages: nextUnlockedStages,
+          completedStages: nextCompletedStages,
+          score: Object.values(nextCompletedStages).filter(Boolean).length,
+        },
+        { merge: true },
+      );
+    });
+
+    const next = await getDoc(ref);
+    return normalizePlayerState(next.data());
   } catch (error) {
     throw mapFirebaseError(error);
   }

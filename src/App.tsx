@@ -7,6 +7,7 @@ import { AlreadyRedeemedPage } from "./pages/AlreadyRedeemedPage";
 import { ChallengeFailedPage } from "./pages/ChallengeFailedPage";
 import { CheckpointDetailPage } from "./pages/CheckpointDetailPage";
 import { CheckpointListPage } from "./pages/CheckpointListPage";
+import { CheckpointManagementPage } from "./pages/CheckpointManagementPage";
 import { CompletionAnimationPage } from "./pages/CompletionAnimationPage";
 import { ErrorPage } from "./pages/ErrorPage";
 import { FinalResultPage } from "./pages/FinalResultPage";
@@ -111,6 +112,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <RedeemPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/checkpoints"
+          element={
+            <ProtectedRoute>
+              <CheckpointManagementPage />
             </ProtectedRoute>
           }
         />

@@ -45,6 +45,7 @@ service cloud.firestore {
         'redeemRequested',
         'redeemRequestTime',
         'completedStages',
+        'unlockedStages',
         'account',
         'role'
       ])
@@ -54,6 +55,7 @@ service cloud.firestore {
       && request.resource.data.redeemRequested is bool
       && (request.resource.data.redeemRequestTime == null || request.resource.data.redeemRequestTime is string)
       && request.resource.data.completedStages is map
+      && request.resource.data.unlockedStages is map
       && request.resource.data.account is string
       && request.resource.data.role in ['admin', 'player'];
     }
@@ -66,7 +68,8 @@ service cloud.firestore {
         && request.resource.data.redeemTime == null
         && request.resource.data.redeemRequested == false
         && request.resource.data.redeemRequestTime == null
-        && request.resource.data.completedStages.size() == 0;
+        && request.resource.data.completedStages.size() == 0
+        && request.resource.data.unlockedStages.size() == 0;
     }
 
     function redeemIsOpen() {

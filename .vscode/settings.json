@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^npm install -D vitest$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

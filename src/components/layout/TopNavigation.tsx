@@ -24,11 +24,18 @@ export function TopNavigation({ score, total }: TopNavigationProps) {
         <div className="flex items-center gap-3">
           <NeoBadge tone="info">分數 {score} / {total}</NeoBadge>
           {uid && isAdmin && (
-            <Link to="/admin/redeem">
-              <NeoButton variant="primary" className="min-h-0 px-3 py-2 text-sm">
-                兌換管理
-              </NeoButton>
-            </Link>
+            <>
+              <Link to="/admin/checkpoints">
+                <NeoButton variant="secondary" className="min-h-0 px-3 py-2 text-sm">
+                  關卡管理
+                </NeoButton>
+              </Link>
+              <Link to="/admin/redeem">
+                <NeoButton variant="primary" className="min-h-0 px-3 py-2 text-sm">
+                  兌換管理
+                </NeoButton>
+              </Link>
+            </>
           )}
           {uid && (
             <NeoButton

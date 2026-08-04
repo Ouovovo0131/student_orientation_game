@@ -1,11 +1,19 @@
 export type StageId = string;
 export type PlayerRole = "admin" | "player";
 
+export interface CheckpointQuiz {
+  prompt: string;
+  options: string[];
+  answerIndex: number;
+  explanation: string;
+}
+
 export interface Checkpoint {
   id: StageId;
   title: string;
   description: string;
   videoUrl: string;
+  quiz?: CheckpointQuiz;
 }
 
 export interface PlayerState {
@@ -15,6 +23,7 @@ export interface PlayerState {
   redeemRequested: boolean;
   redeemRequestTime: string | null;
   completedStages: Record<StageId, boolean>;
+  unlockedStages: Record<StageId, boolean>;
   account: string;
   role: PlayerRole;
 }
