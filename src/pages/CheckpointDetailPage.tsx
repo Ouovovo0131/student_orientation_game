@@ -1,5 +1,5 @@
-import { ArrowRight } from "lucide-react";
-import { Link, useParams } from "react-router-dom";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { PageContainer } from "../components/layout/PageContainer";
 import { NeoBadge } from "../components/ui/NeoBadge";
 import { NeoButton } from "../components/ui/NeoButton";
@@ -9,6 +9,7 @@ import { useGame } from "../hooks/useGame";
 
 export function CheckpointDetailPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const checkpoint = useCheckpoint(id);
   const { player } = useGame();
 
@@ -27,6 +28,15 @@ export function CheckpointDetailPage() {
 
   return (
     <PageContainer className="max-w-3xl">
+      <NeoButton
+        type="button"
+        variant="secondary"
+        className="mb-4 px-4 py-2"
+        onClick={() => navigate(-1)}
+      >
+        <ArrowLeft className="mr-1 inline" size={18} />
+        返回上一頁
+      </NeoButton>
       <NeoCard>
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-3xl font-black">{checkpoint.title}</h1>
