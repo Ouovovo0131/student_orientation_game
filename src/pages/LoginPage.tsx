@@ -23,7 +23,7 @@ export function LoginPage() {
       <NeoCard>
         <h1 className="text-3xl font-black">Google 學校帳號登入</h1>
         <p className="mt-3 text-sm">
-          請使用你的學校 Google 帳號登入，電子郵件必須以 {schoolDomain} 結尾。
+          請使用你的學校 Google 帳號登入，電子郵件是以 {schoolDomain} 結尾。
         </p>
         <div className="mt-6 space-y-4">
           <p className="rounded-2xl border-4 border-black bg-[#FFF8E8] p-4 text-sm font-bold shadow-[4px_4px_0_0_#000]">

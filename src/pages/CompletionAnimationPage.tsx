@@ -27,16 +27,9 @@ export function CompletionAnimationPage() {
         </NeoCard>
       </PageContainer>
       <BottomActionBar>
-        <div className="grid gap-3 md:grid-cols-2">
-          <Link to="/checkpoints">
-            <NeoButton fullWidth variant="secondary">
-              繼續其他關卡
-            </NeoButton>
-          </Link>
-          <Link to="/result">
-            <NeoButton fullWidth>查看最終結果</NeoButton>
-          </Link>
-        </div>
+        <Link to="/checkpoints">
+          <NeoButton fullWidth>繼續其他關卡</NeoButton>
+        </Link>
       </BottomActionBar>
     </>
   );
