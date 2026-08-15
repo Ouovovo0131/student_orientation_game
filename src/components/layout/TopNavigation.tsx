@@ -23,6 +23,7 @@ export function TopNavigation({ score, total }: TopNavigationProps) {
         </Link>
         <div className="flex items-center gap-3">
           <NeoBadge tone="info">分數 {score} / {total}</NeoBadge>
+          {player?.playerUid && <NeoBadge tone="success">玩家 UID {player.playerUid}</NeoBadge>}
           {uid && isAdmin && (
             <>
               <Link to="/admin/checkpoints">

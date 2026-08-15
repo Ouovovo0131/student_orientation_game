@@ -17,6 +17,7 @@ export interface Checkpoint {
 }
 
 export interface PlayerState {
+  playerUid: number | null;
   score: number;
   isRedeemed: boolean;
   redeemTime: string | null;

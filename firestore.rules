@@ -39,6 +39,7 @@ service cloud.firestore {
 
     function hasValidShape() {
       return request.resource.data.keys().hasOnly([
+        'playerUid',
         'score',
         'isRedeemed',
         'redeemTime',
@@ -49,6 +50,13 @@ service cloud.firestore {
         'account',
         'role'
       ])
+      && (
+        !request.resource.data.keys().hasAny(['playerUid'])
+        || (
+          request.resource.data.playerUid is int
+          && request.resource.data.playerUid > 0
+        )
+      )
       && request.resource.data.score is int
       && request.resource.data.isRedeemed is bool
       && (request.resource.data.redeemTime == null || request.resource.data.redeemTime is string)
@@ -58,6 +66,14 @@ service cloud.firestore {
       && request.resource.data.unlockedStages is map
       && request.resource.data.account is string
       && request.resource.data.role in ['admin', 'player'];
+    }
+
+    function playerUidUnchangedOrFirstSet() {
+      return (
+        !resource.data.keys().hasAny(['playerUid'])
+        || !(resource.data.playerUid is int)
+        || request.resource.data.playerUid == resource.data.playerUid
+      );
     }
 
     function isInitialDocument() {
@@ -92,6 +108,7 @@ service cloud.firestore {
     function isValidProgressUpdate() {
       return hasValidShape()
         && roleMatchesAuth()
+        && playerUidUnchangedOrFirstSet()
         && request.resource.data.score >= resource.data.score
         && request.resource.data.score <= resource.data.score + 1
         && request.resource.data.completedStages.size() >= resource.data.completedStages.size()
@@ -148,10 +165,27 @@ service cloud.firestore {
         );
     }
 
+    function isValidAdminCheckpointUpdate() {
+      return hasValidShape()
+        && request.resource.data.account == resource.data.account
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.isRedeemed == resource.data.isRedeemed
+        && request.resource.data.redeemTime == resource.data.redeemTime
+        && request.resource.data.redeemRequested == currentRedeemRequested()
+        && request.resource.data.redeemRequestTime == currentRedeemRequestTime()
+        && playerUidUnchangedOrFirstSet()
+        && request.resource.data.score >= resource.data.score
+        && request.resource.data.completedStages.size() >= resource.data.completedStages.size()
+        && request.resource.data.completedStages.values().hasOnly([true]);
+    }
+
     match /players/{uid} {
       allow read: if (isOwner(uid) || isAdmin()) && isSchoolAccount();
       allow create: if isOwner(uid) && isSchoolAccount() && isInitialDocument();
-      allow update: if isOwner(uid) && isSchoolAccount() && isValidProgressUpdate();
+      allow update: if isSchoolAccount() && (
+        (isOwner(uid) && isValidProgressUpdate())
+        || (isAdmin() && isValidAdminCheckpointUpdate())
+      );
       allow delete: if false;
     }
 

@@ -1,5 +1,10 @@
 import { Router } from "express";
 import {
+  ensureCurrentPlayerUid,
+  setCheckpointAccessByAdmin,
+  syncMissingPlayerUids,
+} from "../services/adminService";
+import {
   completeStageInTransaction,
   getOrCreatePlayer,
   redeemInTransaction,
@@ -40,6 +45,67 @@ router.post("/players/:uid/redeem", async (req, res) => {
     res.json({ ok: true, message: "兌換狀態更新成功", data });
   } catch (error) {
     const message = error instanceof Error ? error.message : "兌換失敗";
+    res.status(400).json({ ok: false, message, data: null });
+  }
+});
+
+router.post("/player/ensure-uid", async (req, res) => {
+  const { idToken } = req.body as { idToken?: string };
+
+  if (!idToken) {
+    res.status(400).json({ ok: false, message: "缺少 idToken", data: null });
+    return;
+  }
+
+  try {
+    const data = await ensureCurrentPlayerUid(idToken);
+    res.json({ ok: true, message: "玩家數字 UID 已確認", data });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "確認玩家 UID 失敗";
+    res.status(400).json({ ok: false, message, data: null });
+  }
+});
+
+router.post("/admin/player-uids/sync", async (req, res) => {
+  const { idToken } = req.body as { idToken?: string };
+
+  if (!idToken) {
+    res.status(400).json({ ok: false, message: "缺少 idToken", data: null });
+    return;
+  }
+
+  try {
+    const data = await syncMissingPlayerUids(idToken);
+    res.json({ ok: true, message: "已完成玩家 UID 補齊", data });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "補齊玩家 UID 失敗";
+    res.status(400).json({ ok: false, message, data: null });
+  }
+});
+
+router.post("/admin/checkpoint-access", async (req, res) => {
+  const {
+    idToken,
+    target,
+    stageIds,
+    options,
+  } = req.body as {
+    idToken?: string;
+    target?: string;
+    stageIds?: string[];
+    options?: { unlocked?: boolean; completed?: boolean };
+  };
+
+  if (!idToken || !target || !Array.isArray(stageIds)) {
+    res.status(400).json({ ok: false, message: "缺少必要參數", data: null });
+    return;
+  }
+
+  try {
+    const data = await setCheckpointAccessByAdmin(idToken, target, stageIds, options);
+    res.json({ ok: true, message: "關卡權限更新成功", data });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "關卡權限更新失敗";
     res.status(400).json({ ok: false, message, data: null });
   }
 });

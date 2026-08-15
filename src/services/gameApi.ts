@@ -30,8 +30,73 @@ interface CurrentIdentity {
   role: PlayerRole;
 }
 
+interface ServerEnvelope<T> {
+  ok: boolean;
+  message: string;
+  data: T | null;
+}
+
+interface EnsurePlayerUidPayload {
+  playerUid: number;
+}
+
+interface SyncPlayerUidPayload {
+  assignedCount: number;
+  totalPlayers: number;
+}
+
+function getServerApiBaseUrl(): string {
+  const value = import.meta.env.VITE_SERVER_API_BASE_URL;
+  if (typeof value === "string" && value.trim()) {
+    return value.trim().replace(/\/$/, "");
+  }
+  return "/api";
+}
+
+async function callServerApi<T>(
+  path: string,
+  body: Record<string, unknown>,
+): Promise<T> {
+  const response = await fetch(`${getServerApiBaseUrl()}${path}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  let payload: ServerEnvelope<T> | null = null;
+  try {
+    payload = (await response.json()) as ServerEnvelope<T>;
+  } catch {
+    payload = null;
+  }
+
+  if (!response.ok || !payload?.ok || payload.data == null) {
+    throw new Error(payload?.message ?? "伺服器操作失敗，請稍後再試。");
+  }
+
+  return payload.data;
+}
+
+async function getCurrentIdToken(expectedUid: string): Promise<string> {
+  const auth = getFirebaseAuth();
+  const user = auth.currentUser ?? await waitForAuthUser();
+  if (!user || user.uid !== expectedUid) {
+    throw new Error("登入狀態已失效，請重新登入後再試。");
+  }
+  return user.getIdToken(true);
+}
+
+async function ensureNumericPlayerUid(uid: string): Promise<number> {
+  const idToken = await getCurrentIdToken(uid);
+  const data = await callServerApi<EnsurePlayerUidPayload>("/player/ensure-uid", { idToken });
+  return data.playerUid;
+}
+
 function initialPlayerState(identity: CurrentIdentity): PlayerState {
   return {
+    playerUid: null,
     score: 0,
     isRedeemed: false,
     redeemTime: null,
@@ -47,6 +112,9 @@ function initialPlayerState(identity: CurrentIdentity): PlayerState {
 function normalizePlayerState(input: DocumentData | undefined): PlayerState {
   const data = input ?? {};
   return {
+    playerUid: typeof data.playerUid === "number" && Number.isInteger(data.playerUid)
+      ? data.playerUid
+      : null,
     score: Number(data.score ?? 0),
     isRedeemed: Boolean(data.isRedeemed),
     redeemTime: typeof data.redeemTime === "string" ? data.redeemTime : null,
@@ -151,11 +219,27 @@ export async function getPlayerState(uid: string): Promise<PlayerState> {
     const snapshot = await getDoc(ref);
     if (!snapshot.exists()) {
       const initial = initialPlayerState(identity);
-      await setDoc(ref, initial);
+      await setDoc(ref, {
+        score: initial.score,
+        isRedeemed: initial.isRedeemed,
+        redeemTime: initial.redeemTime,
+        redeemRequested: initial.redeemRequested,
+        redeemRequestTime: initial.redeemRequestTime,
+        completedStages: initial.completedStages,
+        unlockedStages: initial.unlockedStages,
+        account: initial.account,
+        role: initial.role,
+      });
+      initial.playerUid = await ensureNumericPlayerUid(uid);
       return initial;
     }
 
-    const data = normalizePlayerState(snapshot.data());
+    let data = normalizePlayerState(snapshot.data());
+    if (!data.playerUid) {
+      const playerUid = await ensureNumericPlayerUid(uid);
+      data = { ...data, playerUid };
+    }
+
     if (
       data.account !== identity.email
       || data.role !== identity.role
@@ -363,38 +447,28 @@ export async function setCheckpointAccess(
     throw new Error("請至少選擇一個關卡。" );
   }
 
-  const ref = getPlayerRef(targetUid);
+  try {
+    const idToken = await getCurrentIdToken(adminUid);
+    return await callServerApi<PlayerState>("/admin/checkpoint-access", {
+      idToken,
+      target: targetUid.trim(),
+      stageIds: normalizedStageIds,
+      options,
+    });
+  } catch (error) {
+    throw mapFirebaseError(error);
+  }
+}
+
+export async function syncMissingPlayerUids(uid: string): Promise<SyncPlayerUidPayload> {
+  const identity = await getCurrentIdentity(uid);
+  if (identity.role !== "admin") {
+    throw new Error("只有管理員可以補齊玩家 UID。" );
+  }
 
   try {
-    await runTransaction(getFirebaseDb(), async (transaction) => {
-      const snapshot = await transaction.get(ref);
-      const current = normalizePlayerState(snapshot.data());
-      const nextUnlockedStages = { ...current.unlockedStages };
-      const nextCompletedStages = { ...current.completedStages };
-
-      normalizedStageIds.forEach((stageId) => {
-        if (options.unlocked !== false) {
-          nextUnlockedStages[stageId] = true;
-        }
-
-        if (options.completed) {
-          nextCompletedStages[stageId] = true;
-        }
-      });
-
-      transaction.set(
-        ref,
-        {
-          unlockedStages: nextUnlockedStages,
-          completedStages: nextCompletedStages,
-          score: Object.values(nextCompletedStages).filter(Boolean).length,
-        },
-        { merge: true },
-      );
-    });
-
-    const next = await getDoc(ref);
-    return normalizePlayerState(next.data());
+    const idToken = await getCurrentIdToken(uid);
+    return await callServerApi<SyncPlayerUidPayload>("/admin/player-uids/sync", { idToken });
   } catch (error) {
     throw mapFirebaseError(error);
   }

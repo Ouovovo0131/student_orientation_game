@@ -8,7 +8,15 @@
 - 前端使用統一 Neo-Brutalism 設計系統
 - 全站包含中文錯誤訊息與目前任務提示
 - 登入需使用學校帳號，電子郵件必須以 `@hlhs.hlc.edu.tw` 結尾
-- 遊戲資料由前端直接透過 Firestore SDK 存取（不依賴自建後端 API）
+- 玩家進度由前端 Firestore SDK 存取；管理操作與數字 UID 配發由後端 API 處理
+
+## UID 說明
+
+- `players/{文件ID}` 仍使用 Firebase Auth UID（英數混合）作為資料主鍵。
+- 每位玩家另有 `playerUid`（純數字），例如 `11500001`、`11500002`。
+- `playerUid` 由伺服器交易配發，確保唯一且遞增。
+- 管理頁可使用數字 UID、Email 或 Firebase Auth UID 查找玩家。
+- 管理頁提供「補齊所有缺少數字 UID 的玩家」按鈕，可一次回填既有資料。
 
 ## 啟動步驟
 
@@ -19,16 +27,26 @@
 5. 根目錄執行 `npm run dev`
 6. 另一個終端機執行 `npm run server:dev`
 
+若前端與後端不是同網域部署，請額外設定：
+
+- `VITE_SERVER_API_BASE_URL`（例如 `https://your-server.example.com/api`）
+
 ## Firebase 文件結構
 
-使用 `players/{uid}` 文件，預設內容：
+使用 `players/{authUid}` 文件，預設內容：
 
 ```json
 {
+  "playerUid": 11500001,
   "score": 0,
   "isRedeemed": false,
   "redeemTime": null,
-  "completedStages": {}
+  "redeemRequested": false,
+  "redeemRequestTime": null,
+  "completedStages": {},
+  "unlockedStages": {},
+  "account": "student@hlhs.hlc.edu.tw",
+  "role": "player"
 }
 ```
 
