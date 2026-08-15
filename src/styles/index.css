@@ -46,6 +46,54 @@ body {
   }
 }
 
+@keyframes stage-locked-pulse {
+  0% {
+    transform: translateX(0);
+    box-shadow: 8px 8px 0 0 #000;
+  }
+  20% {
+    transform: translateX(-6px);
+  }
+  40% {
+    transform: translateX(6px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
+  100% {
+    transform: translateX(0);
+    box-shadow: 8px 8px 0 0 #000;
+  }
+}
+
+@keyframes stage-unlocked-pop {
+  0% {
+    transform: scale(0.98);
+    box-shadow: 8px 8px 0 0 #000;
+    background-color: #d9fce8;
+  }
+  45% {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 6px rgba(59, 234, 125, 0.45), 8px 8px 0 0 #000;
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 8px 8px 0 0 #000;
+    background-color: #ffffff;
+  }
+}
+
+.animate-stage-locked {
+  animation: stage-locked-pulse 0.8s ease;
+}
+
+.animate-stage-unlocked {
+  animation: stage-unlocked-pop 1s ease;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.001ms !important;

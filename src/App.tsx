@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { TopNavigation } from "./components/layout/TopNavigation";
 import { StatusBanner } from "./components/ui/StatusBanner";
 import { useGame } from "./hooks/useGame";
+import { AccountPage } from "./pages/AccountPage";
 import { AlreadyRedeemedPage } from "./pages/AlreadyRedeemedPage";
 import { ChallengeFailedPage } from "./pages/ChallengeFailedPage";
 import { CheckpointDetailPage } from "./pages/CheckpointDetailPage";
@@ -68,6 +69,14 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/loading" element={<LoadingPage />} />
         <Route path="/error" element={<ErrorPage />} />
+        <Route
+          path="/account"
+          element={
+            <ProtectedRoute>
+              <AccountPage />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/checkpoints"
           element={

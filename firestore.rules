@@ -114,6 +114,11 @@ service cloud.firestore {
         && request.resource.data.completedStages.size() >= resource.data.completedStages.size()
         && request.resource.data.completedStages.size() <= resource.data.completedStages.size() + 1
         && request.resource.data.completedStages.values().hasOnly([true])
+        && request.resource.data.completedStages.keys().hasOnly(
+          resource.data.completedStages.keys().concat(
+            resource.data.unlockedStages.keys().concat(['stage-01'])
+          )
+        )
         && (
           request.resource.data.isRedeemed == resource.data.isRedeemed
           || (

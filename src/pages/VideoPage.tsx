@@ -1,10 +1,11 @@
 import { ArrowLeft } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { PageContainer } from "../components/layout/PageContainer";
 import { NeoButton } from "../components/ui/NeoButton";
 import { NeoVideoCard } from "../components/video/NeoVideoCard";
 import { useCheckpoint } from "../hooks/useCheckpoint";
 import { useGame } from "../hooks/useGame";
+import { getStageAccessStatus } from "../utils/checkpointAccess";
 
 export function VideoPage() {
   const { id } = useParams();
@@ -21,6 +22,11 @@ export function VideoPage() {
   }
 
   const completed = Boolean(player?.completedStages[checkpoint.id]);
+  const stageStatus = getStageAccessStatus(checkpoint.id, player?.unlockedStages, player?.completedStages);
+
+  if (stageStatus === "locked") {
+    return <Navigate to={`/checkpoints?focus=${checkpoint.id}&mode=locked`} replace />;
+  }
 
   return (
     <PageContainer className="max-w-4xl">

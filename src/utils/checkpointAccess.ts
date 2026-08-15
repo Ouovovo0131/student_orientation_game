@@ -2,6 +2,8 @@ import type { StageId } from "../types";
 
 export type CheckpointAccessStatus = "locked" | "unlocked" | "completed";
 
+const FIRST_STAGE_ID = "stage-01" as StageId;
+
 interface CheckpointAccessInput {
   completed: boolean;
   unlocked: boolean;
@@ -17,6 +19,32 @@ export function getCheckpointStatus({ completed, unlocked }: CheckpointAccessInp
   }
 
   return "locked";
+}
+
+export function isStageUnlocked(
+  stageId: StageId,
+  unlockedStages: Record<StageId, boolean> | undefined,
+  completedStages: Record<StageId, boolean> | undefined,
+): boolean {
+  if (stageId === FIRST_STAGE_ID) {
+    return true;
+  }
+
+  if (Boolean(completedStages?.[stageId])) {
+    return true;
+  }
+
+  return Boolean(unlockedStages?.[stageId]);
+}
+
+export function getStageAccessStatus(
+  stageId: StageId,
+  unlockedStages: Record<StageId, boolean> | undefined,
+  completedStages: Record<StageId, boolean> | undefined,
+): CheckpointAccessStatus {
+  const completed = Boolean(completedStages?.[stageId]);
+  const unlocked = isStageUnlocked(stageId, unlockedStages, completedStages);
+  return getCheckpointStatus({ completed, unlocked });
 }
 
 export function buildStageRange(start: number, end: number, total: number): StageId[] {

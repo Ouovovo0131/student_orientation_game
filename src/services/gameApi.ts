@@ -12,6 +12,7 @@ import {
 import { CHECKPOINTS } from "../assets/checkpoints";
 import { getFirebaseAuth, getFirebaseDb } from "../firebase/client";
 import type { PlayerRole, PlayerState, RedeemControl, RedeemStats, StageId } from "../types";
+import { isStageUnlocked } from "../utils/checkpointAccess";
 
 const PLAYERS_COLLECTION = "players";
 const ADMINS_COLLECTION = "admins";
@@ -286,6 +287,10 @@ export async function completeStage(uid: string, stageId: StageId): Promise<Play
     await runTransaction(getFirebaseDb(), async (transaction) => {
       const snapshot = await transaction.get(ref);
       const current = normalizePlayerState(snapshot.data());
+
+      if (!isStageUnlocked(stageId, current.unlockedStages, current.completedStages)) {
+        throw new Error("此關卡尚未解鎖，請先完成前一關。" );
+      }
 
       if (current.completedStages[stageId]) {
         return;

@@ -1,11 +1,12 @@
 import { ArrowLeft } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { PageContainer } from "../components/layout/PageContainer";
 import { NeoButton } from "../components/ui/NeoButton";
 import { NeoCard } from "../components/ui/NeoCard";
 import { useCheckpoint } from "../hooks/useCheckpoint";
 import { useGame } from "../hooks/useGame";
+import { getStageAccessStatus } from "../utils/checkpointAccess";
 
 export function QuizPage() {
   const { id } = useParams();
@@ -25,8 +26,13 @@ export function QuizPage() {
   }
 
   const completed = Boolean(player?.completedStages[checkpoint.id]);
+  const stageStatus = getStageAccessStatus(checkpoint.id, player?.unlockedStages, player?.completedStages);
   const quiz = checkpoint.quiz;
   const quizOptions = useMemo(() => quiz?.options ?? [], [quiz]);
+
+  if (stageStatus === "locked") {
+    return <Navigate to={`/checkpoints?focus=${checkpoint.id}&mode=locked`} replace />;
+  }
 
   const handleAnswer = async (index: number) => {
     if (!quiz || submitting || completed || quizState === "correct") {

@@ -1,5 +1,5 @@
-import { Home } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Home, UserRound } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useGame } from "../../hooks/useGame";
 import { NeoButton } from "../ui/NeoButton";
 import { NeoBadge } from "../ui/NeoBadge";
@@ -10,8 +10,7 @@ interface TopNavigationProps {
 }
 
 export function TopNavigation({ score, total }: TopNavigationProps) {
-  const navigate = useNavigate();
-  const { uid, player, logout, loading } = useGame();
+  const { uid, player } = useGame();
   const isAdmin = player?.role === "admin";
 
   return (
@@ -39,17 +38,11 @@ export function TopNavigation({ score, total }: TopNavigationProps) {
             </>
           )}
           {uid && (
-            <NeoButton
-              variant="secondary"
-              disabled={loading}
-              className="min-h-0 px-3 py-2 text-sm"
-              onClick={async () => {
-                await logout();
-                navigate("/login", { replace: true });
-              }}
-            >
-              登出
-            </NeoButton>
+            <Link to="/account">
+              <NeoButton variant="secondary" className="min-h-0 px-3 py-2 text-sm">
+                <UserRound className="mr-1 inline" size={16} /> 帳號
+              </NeoButton>
+            </Link>
           )}
         </div>
       </div>

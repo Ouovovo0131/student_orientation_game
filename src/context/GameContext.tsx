@@ -18,7 +18,7 @@ import {
   redeem,
   updateRedeemControl,
 } from "../services/gameApi";
-import type { GameContextValue, PlayerState, RedeemControl, StageId } from "../types";
+import type { GameContextValue, PlayerState, RedeemControl, StageId, UserProfile } from "../types";
 
 export const GameContext = createContext<GameContextValue | null>(null);
 
@@ -36,6 +36,7 @@ export function GameProvider({ children }: PropsWithChildren) {
     localStorage.getItem("orientation_uid"),
   );
   const [player, setPlayer] = useState<PlayerState | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [redeemControl, setRedeemControlState] = useState<RedeemControl>(DEFAULT_REDEEM_CONTROL);
 
   useEffect(() => {
@@ -44,9 +45,16 @@ export function GameProvider({ children }: PropsWithChildren) {
         localStorage.removeItem("orientation_uid");
         setUid(null);
         setPlayer(null);
+        setUserProfile(null);
         setRedeemControlState(DEFAULT_REDEEM_CONTROL);
         return;
       }
+
+      setUserProfile({
+        displayName: user.displayName?.trim() || user.email?.split("@")[0] || "未命名玩家",
+        email: user.email?.trim() || "",
+        photoURL: user.photoURL,
+      });
 
       if (user.uid !== localStorage.getItem("orientation_uid")) {
         localStorage.setItem("orientation_uid", user.uid);
@@ -106,6 +114,7 @@ export function GameProvider({ children }: PropsWithChildren) {
     localStorage.removeItem("orientation_uid");
     setUid(null);
     setPlayer(null);
+    setUserProfile(null);
     setRedeemControlState(DEFAULT_REDEEM_CONTROL);
   }, [withTask]);
 
@@ -150,6 +159,7 @@ export function GameProvider({ children }: PropsWithChildren) {
       taskMessage,
       error,
       player,
+      userProfile,
       redeemControl,
       uid,
       totalCheckpoints: CHECKPOINTS.length,
@@ -167,6 +177,7 @@ export function GameProvider({ children }: PropsWithChildren) {
       taskMessage,
       error,
       player,
+      userProfile,
       redeemControl,
       uid,
       loginWithSchoolAccount,

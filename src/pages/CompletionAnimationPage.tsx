@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { CHECKPOINTS } from "../assets/checkpoints";
 import { BottomActionBar } from "../components/layout/BottomActionBar";
 import { PageContainer } from "../components/layout/PageContainer";
 import { NeoButton } from "../components/ui/NeoButton";
@@ -11,6 +12,17 @@ export function CompletionAnimationPage() {
   const [search] = useSearchParams();
   const stage = search.get("stage") ?? "關卡";
   const reduceMotion = useReducedMotion();
+  const nextCheckpointId = (() => {
+    const index = CHECKPOINTS.findIndex((checkpoint) => checkpoint.id === stage);
+    if (index < 0) {
+      return null;
+    }
+    return CHECKPOINTS[index + 1]?.id ?? null;
+  })();
+
+  const nextCheckpointLink = nextCheckpointId
+    ? `/checkpoints?focus=${nextCheckpointId}&mode=unlock`
+    : "/checkpoints";
 
   useEffect(() => {
     launchCelebrationConfetti();
@@ -33,7 +45,7 @@ export function CompletionAnimationPage() {
         </NeoCard>
       </PageContainer>
       <BottomActionBar>
-        <Link to="/checkpoints">
+        <Link to={nextCheckpointLink}>
           <NeoButton fullWidth>繼續其他關卡</NeoButton>
         </Link>
       </BottomActionBar>

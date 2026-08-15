@@ -47,11 +47,18 @@ export interface UserSession {
   uid: string;
 }
 
+export interface UserProfile {
+  displayName: string;
+  email: string;
+  photoURL: string | null;
+}
+
 export interface GameContextValue {
   loading: boolean;
   taskMessage: string;
   error: string | null;
   player: PlayerState | null;
+  userProfile: UserProfile | null;
   redeemControl: RedeemControl;
   uid: string | null;
   totalCheckpoints: number;
