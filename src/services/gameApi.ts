@@ -89,9 +89,13 @@ async function getCurrentIdToken(expectedUid: string): Promise<string> {
 }
 
 async function ensureNumericPlayerUid(uid: string): Promise<number> {
-  const idToken = await getCurrentIdToken(uid);
-  const data = await callServerApi<EnsurePlayerUidPayload>("/player/ensure-uid", { idToken });
-  return data.playerUid;
+  try {
+    const idToken = await getCurrentIdToken(uid);
+    const data = await callServerApi<EnsurePlayerUidPayload>("/player/ensure-uid", { idToken });
+    return data.playerUid;
+  } catch {
+    return 0;
+  }
 }
 
 function initialPlayerState(identity: CurrentIdentity): PlayerState {
@@ -230,14 +234,17 @@ export async function getPlayerState(uid: string): Promise<PlayerState> {
         account: initial.account,
         role: initial.role,
       });
-      initial.playerUid = await ensureNumericPlayerUid(uid);
+      const ensuredUid = await ensureNumericPlayerUid(uid);
+      initial.playerUid = ensuredUid > 0 ? ensuredUid : null;
       return initial;
     }
 
     let data = normalizePlayerState(snapshot.data());
     if (!data.playerUid) {
-      const playerUid = await ensureNumericPlayerUid(uid);
-      data = { ...data, playerUid };
+      const ensuredUid = await ensureNumericPlayerUid(uid);
+      if (ensuredUid > 0) {
+        data = { ...data, playerUid: ensuredUid };
+      }
     }
 
     if (

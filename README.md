@@ -67,6 +67,12 @@
 - Node.js 版本建議使用 20 以上（已在 `package.json` 設定 `engines`）。
 - Firebase Authentication 請啟用 Google 登入，並在 Authorized domains 加入你的 Vercel 網域。
 
+若使用本專案內建的 `/api/*` 管理端點（Vercel Functions），還需要在 Vercel 設定：
+
+- `FIREBASE_PROJECT_ID`
+- `FIREBASE_CLIENT_EMAIL`
+- `FIREBASE_PRIVATE_KEY`（請貼上完整金鑰，含換行；若由單行貼入需保留 `\n`）
+
 ## Firestore 安全規則建議
 
 前端直連 Firestore 時，請至少設定以下方向：
