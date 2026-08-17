@@ -1,5 +1,5 @@
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
-import { db } from "../firebaseAdmin";
+import { getDb } from "../firebaseAdmin";
 
 const PLAYERS = "players";
 
@@ -11,6 +11,7 @@ export interface PlayerDocument {
 }
 
 export async function getOrCreatePlayer(uid: string): Promise<PlayerDocument> {
+  const db = getDb();
   const ref = db.collection(PLAYERS).doc(uid);
   const snapshot = await ref.get();
 
@@ -29,6 +30,7 @@ export async function getOrCreatePlayer(uid: string): Promise<PlayerDocument> {
 }
 
 export async function completeStageInTransaction(uid: string, stageId: string): Promise<PlayerDocument> {
+  const db = getDb();
   const ref = db.collection(PLAYERS).doc(uid);
 
   await db.runTransaction(async (tx) => {
@@ -57,6 +59,7 @@ export async function completeStageInTransaction(uid: string, stageId: string): 
 }
 
 export async function redeemInTransaction(uid: string, totalCheckpoints: number): Promise<PlayerDocument> {
+  const db = getDb();
   const ref = db.collection(PLAYERS).doc(uid);
 
   await db.runTransaction(async (tx) => {

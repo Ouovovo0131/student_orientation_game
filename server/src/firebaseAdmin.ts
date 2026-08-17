@@ -1,18 +1,35 @@
-import { cert, getApps, initializeApp } from "firebase-admin/app";
+import { cert, getApps, initializeApp, type App } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 
-const projectId = process.env.FIREBASE_PROJECT_ID;
-const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
+let cachedApp: App | null = null;
 
-if (!projectId || !clientEmail || !privateKey) {
-  throw new Error("Firebase Admin 環境變數未設定完整，請檢查 server 啟動設定。");
+function getRequiredEnv(name: string): string {
+  const value = process.env[name]?.trim();
+  if (!value) {
+    throw new Error(
+      "Firebase Admin 環境變數未設定完整，請檢查 FIREBASE_PROJECT_ID / FIREBASE_CLIENT_EMAIL / FIREBASE_PRIVATE_KEY。",
+    );
+  }
+  return value;
 }
 
-const app =
-  getApps()[0] ??
-  initializeApp({
+function getAdminApp(): App {
+  if (cachedApp) {
+    return cachedApp;
+  }
+
+  const existingApp = getApps()[0];
+  if (existingApp) {
+    cachedApp = existingApp;
+    return existingApp;
+  }
+
+  const projectId = getRequiredEnv("FIREBASE_PROJECT_ID");
+  const clientEmail = getRequiredEnv("FIREBASE_CLIENT_EMAIL");
+  const privateKey = getRequiredEnv("FIREBASE_PRIVATE_KEY").replace(/\\n/g, "\n");
+
+  cachedApp = initializeApp({
     credential: cert({
       projectId,
       clientEmail,
@@ -20,5 +37,13 @@ const app =
     }),
   });
 
-export const adminAuth = getAuth(app);
-export const db = getFirestore(app);
+  return cachedApp;
+}
+
+export function getAdminAuth() {
+  return getAuth(getAdminApp());
+}
+
+export function getDb() {
+  return getFirestore(getAdminApp());
+}

@@ -1,5 +1,5 @@
 import { FieldValue } from "firebase-admin/firestore";
-import { adminAuth, db } from "../firebaseAdmin";
+import { getAdminAuth, getDb } from "../firebaseAdmin";
 
 const PLAYERS = "players";
 const ADMINS = "admins";
@@ -33,7 +33,7 @@ function isSchoolEmail(email: string): boolean {
 }
 
 async function verifyIdentity(idToken: string): Promise<DecodedIdentity> {
-  const decoded = await adminAuth.verifyIdToken(idToken, true);
+  const decoded = await getAdminAuth().verifyIdToken(idToken, true);
   const email = (decoded.email ?? "").trim().toLowerCase();
 
   if (!decoded.uid || !email || !isSchoolEmail(email)) {
@@ -51,6 +51,7 @@ async function assertAdmin(identity: DecodedIdentity): Promise<void> {
     return;
   }
 
+  const db = getDb();
   const adminDoc = await db.collection(ADMINS).doc(identity.uid).get();
   if (!adminDoc.exists) {
     throw new Error("只有管理員可以執行此操作。");
@@ -102,6 +103,8 @@ async function resolveTargetAuthUid(target: string): Promise<string> {
     throw new Error("請填入目標玩家 UID。");
   }
 
+  const db = getDb();
+
   const numericUid = parsePlayerUidTarget(trimmed);
   if (numericUid !== null) {
     const byPlayerUid = await db
@@ -136,6 +139,7 @@ async function resolveTargetAuthUid(target: string): Promise<string> {
 }
 
 async function assignUidIfMissingByAuthUid(authUid: string): Promise<number> {
+  const db = getDb();
   const playerRef = db.collection(PLAYERS).doc(authUid);
   const counterRef = db.collection(SYSTEM).doc(UID_COUNTER_DOC);
 
@@ -205,6 +209,7 @@ export async function syncMissingPlayerUids(idToken: string): Promise<{ assigned
   const identity = await verifyIdentity(idToken);
   await assertAdmin(identity);
 
+  const db = getDb();
   const snapshot = await db.collection(PLAYERS).get();
   const docs = [...snapshot.docs];
   docs.sort((a, b) => {
@@ -246,6 +251,7 @@ export async function setCheckpointAccessByAdmin(
     throw new Error("請至少選擇一個關卡。");
   }
 
+  const db = getDb();
   const targetAuthUid = await resolveTargetAuthUid(target);
   const targetRef = db.collection(PLAYERS).doc(targetAuthUid);
 
