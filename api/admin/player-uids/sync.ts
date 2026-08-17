@@ -1,4 +1,4 @@
-import { syncMissingPlayerUids } from "../../../server/src/services/adminService";
+import { syncMissingPlayerUids } from "../../_lib/adminService";
 
 function getBody(req: { body?: unknown }) {
   if (!req.body) {

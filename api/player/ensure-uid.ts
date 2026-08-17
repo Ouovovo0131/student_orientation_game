@@ -1,4 +1,4 @@
-import { ensureCurrentPlayerUid } from "../../server/src/services/adminService";
+import { ensureCurrentPlayerUid } from "../_lib/adminService";
 
 function getBody(req: { body?: unknown }) {
   if (!req.body) {

@@ -1,4 +1,4 @@
-import { setCheckpointAccessByAdmin } from "../../server/src/services/adminService";
+import { setCheckpointAccessByAdmin } from "../_lib/adminService";
 
 function getBody(req: { body?: unknown }) {
   if (!req.body) {
