@@ -30,7 +30,7 @@ export default async function handler(req: { method?: string; body?: unknown }, 
   }
 
   try {
-    const { syncMissingPlayerUids } = await import("../../_lib/adminService");
+    const { syncMissingPlayerUids } = await import("../../_lib/adminService.js");
     const data = await syncMissingPlayerUids(idToken);
     res.status(200).json({ ok: true, message: "已完成玩家 UID 補齊", data });
   } catch (error) {

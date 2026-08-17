@@ -30,7 +30,7 @@ export default async function handler(req: { method?: string; body?: unknown }, 
   }
 
   try {
-    const { ensureCurrentPlayerUid } = await import("../_lib/adminService");
+    const { ensureCurrentPlayerUid } = await import("../_lib/adminService.js");
     const data = await ensureCurrentPlayerUid(idToken);
     res.status(200).json({ ok: true, message: "玩家數字 UID 已確認", data });
   } catch (error) {

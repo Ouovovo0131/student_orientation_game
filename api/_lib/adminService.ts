@@ -1,5 +1,5 @@
 import { FieldValue } from "firebase-admin/firestore";
-import { getAdminAuth, getDb } from "./firebaseAdmin";
+import { getAdminAuth, getDb } from "./firebaseAdmin.js";
 
 const PLAYERS = "players";
 const ADMINS = "admins";

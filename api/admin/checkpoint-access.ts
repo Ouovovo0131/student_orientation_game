@@ -33,7 +33,7 @@ export default async function handler(req: { method?: string; body?: unknown }, 
   }
 
   try {
-    const { setCheckpointAccessByAdmin } = await import("../_lib/adminService");
+    const { setCheckpointAccessByAdmin } = await import("../_lib/adminService.js");
     const data = await setCheckpointAccessByAdmin(idToken, target, stageIds, options);
     res.status(200).json({ ok: true, message: "關卡權限更新成功", data });
   } catch (error) {
