@@ -26,7 +26,6 @@ const DEFAULT_TASK = "等待玩家開始闖關";
 const DEFAULT_ERROR_MESSAGE = "系統運作出現錯誤，請洽詢製作人或班聯會人員";
 const DEFAULT_REDEEM_CONTROL: RedeemControl = {
   isOpen: false,
-  qrCodeUrl: null,
 };
 
 export function GameProvider({ children }: PropsWithChildren) {

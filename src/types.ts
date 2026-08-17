@@ -31,7 +31,6 @@ export interface PlayerState {
 
 export interface RedeemControl {
   isOpen: boolean;
-  qrCodeUrl: string | null;
 }
 
 export interface RedeemStats {

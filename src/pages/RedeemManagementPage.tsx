@@ -4,7 +4,6 @@ import { PageContainer } from "../components/layout/PageContainer";
 import { NeoBadge } from "../components/ui/NeoBadge";
 import { NeoButton } from "../components/ui/NeoButton";
 import { NeoCard } from "../components/ui/NeoCard";
-import { NeoInput } from "../components/ui/NeoInput";
 import { useGame } from "../hooks/useGame";
 import { getRedeemStats } from "../services/gameApi";
 import type { RedeemStats } from "../types";
@@ -20,14 +19,9 @@ const EMPTY_STATS: RedeemStats = {
 
 export function RedeemManagementPage() {
   const { uid, player, redeemControl, setRedeemControl, loading, totalCheckpoints } = useGame();
-  const [qrCodeUrl, setQrCodeUrl] = useState("");
   const [stats, setStats] = useState<RedeemStats>(EMPTY_STATS);
   const [statsLoading, setStatsLoading] = useState(false);
   const isAdmin = player?.role === "admin";
-
-  useEffect(() => {
-    setQrCodeUrl(redeemControl.qrCodeUrl ?? "");
-  }, [redeemControl.qrCodeUrl]);
 
   const refreshStats = async () => {
     if (!uid || !isAdmin) {
@@ -90,38 +84,10 @@ export function RedeemManagementPage() {
             onClick={async () => {
               await setRedeemControl({
                 isOpen: !redeemControl.isOpen,
-                qrCodeUrl: qrCodeUrl || null,
               });
             }}
           >
             {redeemControl.isOpen ? "立即關閉兌換" : "立即開啟兌換"}
-          </NeoButton>
-        </div>
-      </NeoCard>
-
-      <NeoCard className="mt-4">
-        <h2 className="text-2xl font-black">現場 QR Code 設定</h2>
-        <p className="mt-2 text-sm">可貼上要給玩家出示的圖片網址，儲存後玩家頁面會同步顯示。</p>
-        <div className="mt-4">
-          <NeoInput
-            label="兌換 QR Code 圖片網址"
-            value={qrCodeUrl}
-            onChange={(event) => setQrCodeUrl(event.target.value)}
-            placeholder="https://example.com/redeem-qr.png"
-          />
-        </div>
-        <div className="mt-4">
-          <NeoButton
-            variant="secondary"
-            disabled={loading}
-            onClick={async () => {
-              await setRedeemControl({
-                isOpen: redeemControl.isOpen,
-                qrCodeUrl: qrCodeUrl || null,
-              });
-            }}
-          >
-            儲存 QR Code 設定
           </NeoButton>
         </div>
       </NeoCard>

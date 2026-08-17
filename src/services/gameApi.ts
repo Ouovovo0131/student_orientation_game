@@ -22,7 +22,6 @@ const ADMIN_EMAILS = ["s310165@hlhs.hlc.edu.tw"];
 
 const DEFAULT_REDEEM_CONTROL: RedeemControl = {
   isOpen: false,
-  qrCodeUrl: null,
 };
 
 interface CurrentIdentity {
@@ -144,9 +143,6 @@ function normalizeRedeemControl(input: DocumentData | undefined): RedeemControl 
   const data = input ?? {};
   return {
     isOpen: Boolean(data.isOpen),
-    qrCodeUrl: typeof data.qrCodeUrl === "string" && data.qrCodeUrl.trim()
-      ? data.qrCodeUrl.trim()
-      : null,
   };
 }
 
@@ -431,7 +427,6 @@ export async function updateRedeemControl(uid: string, payload: RedeemControl): 
 
   const next: RedeemControl = {
     isOpen: payload.isOpen,
-    qrCodeUrl: payload.qrCodeUrl?.trim() ? payload.qrCodeUrl.trim() : null,
   };
 
   try {
