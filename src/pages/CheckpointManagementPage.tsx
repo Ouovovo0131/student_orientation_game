@@ -6,7 +6,7 @@ import { NeoButton } from "../components/ui/NeoButton";
 import { NeoCard } from "../components/ui/NeoCard";
 import { NeoInput } from "../components/ui/NeoInput";
 import { useGame } from "../hooks/useGame";
-import { setCheckpointAccess, syncMissingPlayerUids } from "../services/gameApi";
+import { setCheckpointAccess } from "../services/gameApi";
 import { buildStageRange } from "../utils/checkpointAccess";
 
 export function CheckpointManagementPage() {
@@ -16,7 +16,6 @@ export function CheckpointManagementPage() {
   const [endStage, setEndStage] = useState("1");
   const [markCompleted, setMarkCompleted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [syncLoading, setSyncLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const isAdmin = player?.role === "admin";
 
@@ -53,24 +52,6 @@ export function CheckpointManagementPage() {
       );
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleSyncPlayerUids = async () => {
-    if (!uid) {
-      setMessage("尚未登入，無法補齊玩家 UID。");
-      return;
-    }
-
-    setSyncLoading(true);
-    setMessage(null);
-    try {
-      const result = await syncMissingPlayerUids(uid);
-      setMessage(`UID 補齊完成：本次新增 ${result.assignedCount} 筆，玩家總數 ${result.totalPlayers} 筆。`);
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "補齊玩家 UID 失敗，請稍後再試。");
-    } finally {
-      setSyncLoading(false);
     }
   };
 
@@ -119,9 +100,6 @@ export function CheckpointManagementPage() {
           </label>
           <NeoButton disabled={loading} onClick={() => void handleSubmit()}>
             {loading ? "更新中..." : "更新關卡權限"}
-          </NeoButton>
-          <NeoButton variant="secondary" disabled={syncLoading} onClick={() => void handleSyncPlayerUids()}>
-            {syncLoading ? "補齊中..." : "補齊所有缺少數字 UID 的玩家"}
           </NeoButton>
           {message && <p className="text-sm font-bold">{message}</p>}
         </div>

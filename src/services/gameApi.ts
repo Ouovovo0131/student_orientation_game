@@ -41,11 +41,6 @@ interface EnsurePlayerUidPayload {
   playerUid: number;
 }
 
-interface SyncPlayerUidPayload {
-  assignedCount: number;
-  totalPlayers: number;
-}
-
 function getServerApiBaseUrl(): string {
   const value = import.meta.env.VITE_SERVER_API_BASE_URL;
   if (typeof value === "string" && value.trim()) {
@@ -90,13 +85,12 @@ async function getCurrentIdToken(expectedUid: string): Promise<string> {
 }
 
 async function ensureNumericPlayerUid(uid: string): Promise<number> {
-  try {
-    const idToken = await getCurrentIdToken(uid);
-    const data = await callServerApi<EnsurePlayerUidPayload>("/player/ensure-uid", { idToken });
-    return data.playerUid;
-  } catch {
-    return 0;
+  const idToken = await getCurrentIdToken(uid);
+  const data = await callServerApi<EnsurePlayerUidPayload>("/player/ensure-uid", { idToken });
+  if (!Number.isInteger(data.playerUid) || data.playerUid <= 0) {
+    throw new Error("系統無法配發玩家 UID，請稍後再試。");
   }
+  return data.playerUid;
 }
 
 function initialPlayerState(identity: CurrentIdentity): PlayerState {
@@ -224,7 +218,9 @@ export async function getPlayerState(uid: string): Promise<PlayerState> {
     const snapshot = await getDoc(ref);
     if (!snapshot.exists()) {
       const initial = initialPlayerState(identity);
+      initial.playerUid = await ensureNumericPlayerUid(uid);
       await setDoc(ref, {
+        playerUid: initial.playerUid,
         score: initial.score,
         isRedeemed: initial.isRedeemed,
         redeemTime: initial.redeemTime,
@@ -235,17 +231,12 @@ export async function getPlayerState(uid: string): Promise<PlayerState> {
         account: initial.account,
         role: initial.role,
       });
-      const ensuredUid = await ensureNumericPlayerUid(uid);
-      initial.playerUid = ensuredUid > 0 ? ensuredUid : null;
       return initial;
     }
 
     let data = normalizePlayerState(snapshot.data());
     if (!data.playerUid) {
-      const ensuredUid = await ensureNumericPlayerUid(uid);
-      if (ensuredUid > 0) {
-        data = { ...data, playerUid: ensuredUid };
-      }
+      data = { ...data, playerUid: await ensureNumericPlayerUid(uid) };
     }
 
     if (
@@ -467,20 +458,6 @@ export async function setCheckpointAccess(
       stageIds: normalizedStageIds,
       options,
     });
-  } catch (error) {
-    throw mapFirebaseError(error);
-  }
-}
-
-export async function syncMissingPlayerUids(uid: string): Promise<SyncPlayerUidPayload> {
-  const identity = await getCurrentIdentity(uid);
-  if (identity.role !== "admin") {
-    throw new Error("只有管理員可以補齊玩家 UID。" );
-  }
-
-  try {
-    const idToken = await getCurrentIdToken(uid);
-    return await callServerApi<SyncPlayerUidPayload>("/admin/player-uids/sync", { idToken });
   } catch (error) {
     throw mapFirebaseError(error);
   }

@@ -16,7 +16,7 @@
 - 每位玩家另有 `playerUid`（純數字），例如 `11500001`、`11500002`。
 - `playerUid` 由伺服器交易配發，確保唯一且遞增。
 - 管理頁可使用數字 UID、Email 或 Firebase Auth UID 查找玩家。
-- 管理頁提供「補齊所有缺少數字 UID 的玩家」按鈕，可一次回填既有資料。
+- 新玩家首次建立 Firestore 文件時，會一併寫入 `playerUid`。
 
 ## 啟動步驟
 
@@ -49,6 +49,19 @@
   "role": "player"
 }
 ```
+
+欄位說明：
+
+- `playerUid`: 純數字玩家編號，由後端配發。
+- `score`: 已完成關卡數。
+- `isRedeemed`: 是否已完成獎勵兌換。
+- `redeemTime`: 完成兌換的 ISO 時間字串，未兌換時為 `null`。
+- `redeemRequested`: 是否已提出兌換申請。
+- `redeemRequestTime`: 提出兌換申請的 ISO 時間字串，未申請時為 `null`。
+- `completedStages`: 已完成關卡，格式為 `{ "stage-id": true }`。
+- `unlockedStages`: 已解鎖關卡，格式為 `{ "stage-id": true }`。
+- `account`: 玩家登入的學校 Email。
+- `role`: `player` 或 `admin`。
 
 ## 注意
 
