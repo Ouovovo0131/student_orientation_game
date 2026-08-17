@@ -60,7 +60,7 @@ export function CheckpointManagementPage() {
       <NeoCard className="bg-[#E8F2FF]">
         <h1 className="text-3xl font-black">關卡管理頁面</h1>
         <p className="mt-2 text-sm">可為指定玩家一次性解鎖單一關卡或連續多個關卡，也可一併標記為已完成。</p>
-        <p className="mt-2 text-sm font-bold">目標玩家可輸入：數字 UID（例如 11500001）、學校 Email，或 Firebase Auth UID。</p>
+        <p className="mt-2 text-sm font-bold">要進行關卡改動的目標玩家須輸入：玩家 UID ( 例如 11500001 ) 、學校 Email ( 例如 s000000@hlhs.hlc.edu.tw )。</p>
       </NeoCard>
 
       <NeoCard className="mt-4">
