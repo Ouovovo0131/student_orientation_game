@@ -51,14 +51,32 @@ export function CheckpointDetailPage() {
           </NeoBadge>
         </div>
         <p className="mt-4 text-base">{checkpoint.description}</p>
-        <p className="mt-4 border-l-4 border-black bg-[#8DD8FF] p-3 text-sm font-bold">
-          分數規則：影片完整播放至結尾後，系統才會自動提交完成，不可手動領分。
-        </p>
-        <Link to={`/video/${checkpoint.id}`} className="mt-6 inline-block">
-          <NeoButton>
-            進入影片闖關 <ArrowRight className="ml-1 inline" size={18} />
-          </NeoButton>
-        </Link>
+        {completed ? (
+          <>
+            <div className="mt-4 border-l-4 border-black bg-[#E8FFF1] p-3 text-sm font-bold">
+              已完成本關，這裡顯示的是關卡摘要。
+            </div>
+            {checkpoint.quiz && (
+              <div className="mt-4 border-4 border-black bg-white p-4 text-sm">
+                <p className="font-black">快問快答摘要</p>
+                <p className="mt-2">題目：{checkpoint.quiz.prompt}</p>
+                <p className="mt-2">正確答案：{checkpoint.quiz.options[checkpoint.quiz.answerIndex]}</p>
+                <p className="mt-2 font-bold">重點說明：{checkpoint.quiz.explanation}</p>
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <p className="mt-4 border-l-4 border-black bg-[#8DD8FF] p-3 text-sm font-bold">
+              分數規則：影片完整播放至結尾後，系統才會自動提交完成，不可手動領分。
+            </p>
+            <Link to={`/video/${checkpoint.id}`} className="mt-6 inline-block">
+              <NeoButton>
+                進入影片闖關 <ArrowRight className="ml-1 inline" size={18} />
+              </NeoButton>
+            </Link>
+          </>
+        )}
       </NeoCard>
     </PageContainer>
   );
