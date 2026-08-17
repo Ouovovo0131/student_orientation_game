@@ -1,5 +1,3 @@
-import { syncMissingPlayerUids } from "../../_lib/adminService";
-
 function getBody(req: { body?: unknown }) {
   if (!req.body) {
     return {} as Record<string, unknown>;
@@ -32,10 +30,11 @@ export default async function handler(req: { method?: string; body?: unknown }, 
   }
 
   try {
+    const { syncMissingPlayerUids } = await import("../../_lib/adminService");
     const data = await syncMissingPlayerUids(idToken);
     res.status(200).json({ ok: true, message: "已完成玩家 UID 補齊", data });
   } catch (error) {
     const message = error instanceof Error ? error.message : "補齊玩家 UID 失敗";
-    res.status(400).json({ ok: false, message, data: null });
+    res.status(500).json({ ok: false, message, data: null });
   }
 }

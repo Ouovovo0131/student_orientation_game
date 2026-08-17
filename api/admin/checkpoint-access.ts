@@ -1,5 +1,3 @@
-import { setCheckpointAccessByAdmin } from "../_lib/adminService";
-
 function getBody(req: { body?: unknown }) {
   if (!req.body) {
     return {} as Record<string, unknown>;
@@ -35,10 +33,11 @@ export default async function handler(req: { method?: string; body?: unknown }, 
   }
 
   try {
+    const { setCheckpointAccessByAdmin } = await import("../_lib/adminService");
     const data = await setCheckpointAccessByAdmin(idToken, target, stageIds, options);
     res.status(200).json({ ok: true, message: "關卡權限更新成功", data });
   } catch (error) {
     const message = error instanceof Error ? error.message : "關卡權限更新失敗";
-    res.status(400).json({ ok: false, message, data: null });
+    res.status(500).json({ ok: false, message, data: null });
   }
 }
