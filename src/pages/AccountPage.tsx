@@ -1,7 +1,6 @@
 import { ArrowLeft, LogOut, UserRound } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { PageContainer } from "../components/layout/PageContainer";
-import { NeoBadge } from "../components/ui/NeoBadge";
 import { NeoButton } from "../components/ui/NeoButton";
 import { NeoCard } from "../components/ui/NeoCard";
 import { useGame } from "../hooks/useGame";
@@ -72,9 +71,6 @@ export function AccountPage() {
             <p className="text-xs font-black uppercase tracking-[0.2em]">玩家 UID（純數字）</p>
             <p className="mt-1 text-2xl font-black">{player?.playerUid ?? "尚未配發"}</p>
           </div>
-          <NeoBadge tone="info" className="w-fit">
-            此 UID 已儲存在 Firestore 的 players 文件欄位 playerUid。
-          </NeoBadge>
         </div>
 
         <NeoButton

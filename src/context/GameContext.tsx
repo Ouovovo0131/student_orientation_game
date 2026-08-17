@@ -23,6 +23,7 @@ import type { GameContextValue, PlayerState, RedeemControl, StageId, UserProfile
 export const GameContext = createContext<GameContextValue | null>(null);
 
 const DEFAULT_TASK = "等待玩家開始闖關";
+const DEFAULT_ERROR_MESSAGE = "系統運作出現錯誤，請洽詢製作人或班聯會人員";
 const DEFAULT_REDEEM_CONTROL: RedeemControl = {
   isOpen: false,
   qrCodeUrl: null,
@@ -74,8 +75,7 @@ export function GameProvider({ children }: PropsWithChildren) {
     try {
       return await action();
     } catch (err) {
-      const text = err instanceof Error ? err.message : "系統發生未知錯誤";
-      setError(text);
+      setError(DEFAULT_ERROR_MESSAGE);
       throw err;
     } finally {
       setLoading(false);
