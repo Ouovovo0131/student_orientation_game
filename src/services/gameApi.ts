@@ -85,12 +85,20 @@ async function getCurrentIdToken(expectedUid: string): Promise<string> {
 }
 
 async function ensureNumericPlayerUid(uid: string): Promise<number> {
-  const idToken = await getCurrentIdToken(uid);
-  const data = await callServerApi<EnsurePlayerUidPayload>("/player/ensure-uid", { idToken });
-  if (!Number.isInteger(data.playerUid) || data.playerUid <= 0) {
-    throw new Error("系統無法配發玩家 UID，請稍後再試。");
+  try {
+    const idToken = await getCurrentIdToken(uid);
+    const data = await callServerApi<EnsurePlayerUidPayload>("/player/ensure-uid", { idToken });
+    if (!Number.isInteger(data.playerUid) || data.playerUid <= 0) {
+      throw new Error("系統無法配發玩家 UID，請稍後再試。");
+    }
+    return data.playerUid;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "";
+    if (message.includes("伺服器操作失敗")) {
+      throw new Error("玩家資料初始化失敗：UID 配發服務目前無法使用。請確認 Vercel 已重新部署，且 FIREBASE_PROJECT_ID / FIREBASE_CLIENT_EMAIL / FIREBASE_PRIVATE_KEY 已正確設定。");
+    }
+    throw error instanceof Error ? error : new Error("玩家資料初始化失敗，請稍後再試。");
   }
-  return data.playerUid;
 }
 
 function initialPlayerState(identity: CurrentIdentity): PlayerState {

@@ -7,16 +7,16 @@ import { useGame } from "../hooks/useGame";
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const { loginWithSchoolAccount, loading, uid } = useGame();
+  const { loginWithSchoolAccount, loading, player, uid } = useGame();
 
   const schoolDomain = "@hlhs.hlc.edu.tw";
   const testAccount = "cheiling0131@gmail.com";
 
   useEffect(() => {
-    if (uid) {
+    if (uid && player) {
       navigate("/checkpoints", { replace: true });
     }
-  }, [uid, navigate]);
+  }, [uid, player, navigate]);
 
   return (
     <PageContainer className="max-w-xl">
