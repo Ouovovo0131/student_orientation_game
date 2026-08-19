@@ -21,6 +21,7 @@ export function NeoVideoCard({
   const youtubePlayerRef = useRef<YT.Player | null>(null);
 
   const youtubeVideoId = useMemo(() => getYouTubeVideoId(videoUrl), [videoUrl]);
+  const isPortraitVideo = useMemo(() => isYouTubeShorts(videoUrl), [videoUrl]);
 
   useEffect(() => {
     if (!youtubeVideoId || !iframeContainerRef.current) {
@@ -76,10 +77,18 @@ export function NeoVideoCard({
       <p className="mt-2 text-sm">{description}</p>
       <div className="mt-4 overflow-hidden border-4 border-black">
         {youtubeVideoId ? (
-          <div className="aspect-video w-full bg-black" ref={iframeContainerRef} aria-label={`${title} YouTube 影片`} />
+          <div
+            className={isPortraitVideo
+              ? "mx-auto aspect-[9/16] w-full max-w-sm bg-black"
+              : "aspect-video w-full bg-black"}
+            ref={iframeContainerRef}
+            aria-label={`${title} YouTube 影片`}
+          />
         ) : (
           <video
-            className="aspect-video w-full bg-black"
+            className={isPortraitVideo
+              ? "mx-auto aspect-[9/16] w-full max-w-sm bg-black"
+              : "aspect-video w-full bg-black"}
             src={videoUrl}
             controls
             controlsList="nodownload"
@@ -139,6 +148,16 @@ function getYouTubeVideoId(url: string): string | null {
   }
 
   return null;
+}
+
+function isYouTubeShorts(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname.toLowerCase().includes("youtube.com")
+      && parsed.pathname.split("/").filter(Boolean).includes("shorts");
+  } catch {
+    return false;
+  }
 }
 
 let youtubeApiLoader: Promise<YT.YTGlobal> | null = null;
