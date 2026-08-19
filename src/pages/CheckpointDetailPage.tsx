@@ -19,7 +19,7 @@ export function CheckpointDetailPage() {
       <PageContainer>
         <NeoCard>
           <h1 className="text-2xl font-black">找不到關卡</h1>
-          <p className="mt-2">請回到關卡列表重新選擇。</p>
+          <p className="mt-2">請掃描該關卡的QR Code後解鎖關卡。</p>
         </NeoCard>
       </PageContainer>
     );
