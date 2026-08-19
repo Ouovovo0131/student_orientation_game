@@ -84,6 +84,10 @@ function normalizePlayerState(
   };
 }
 
+function countCompletedStages(completedStages: Record<string, boolean>): number {
+  return Object.values(completedStages).filter(Boolean).length;
+}
+
 function parsePlayerUidTarget(target: string): number | null {
   if (!/^\d+$/.test(target)) {
     return null;
@@ -275,7 +279,7 @@ export async function setCheckpointAccessByAdmin(
       {
         unlockedStages: nextUnlocked,
         completedStages: nextCompleted,
-        score: Object.values(nextCompleted).filter(Boolean).length,
+        score: countCompletedStages(nextCompleted),
       },
       { merge: true },
     );

@@ -111,6 +111,7 @@ service cloud.firestore {
         && playerUidUnchangedOrFirstSet()
         && request.resource.data.score >= resource.data.score
         && request.resource.data.score <= resource.data.score + 1
+        && request.resource.data.score == request.resource.data.completedStages.size()
         && request.resource.data.completedStages.size() >= resource.data.completedStages.size()
         && request.resource.data.completedStages.size() <= resource.data.completedStages.size() + 1
         && request.resource.data.completedStages.values().hasOnly([true])
@@ -182,6 +183,7 @@ service cloud.firestore {
         && request.resource.data.redeemRequestTime == currentRedeemRequestTime()
         && playerUidUnchangedOrFirstSet()
         && request.resource.data.score >= resource.data.score
+        && request.resource.data.score == request.resource.data.completedStages.size()
         && request.resource.data.completedStages.size() >= resource.data.completedStages.size()
         && request.resource.data.completedStages.values().hasOnly([true]);
     }

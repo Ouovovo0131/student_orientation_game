@@ -24,11 +24,11 @@ export function LandingPage() {
           )}
           {uid && (
             <Link to="/checkpoints">
-              <NeoButton>開始挑戰</NeoButton>
+              <NeoButton>開始闖關</NeoButton>
             </Link>
           )}
-          <Link to="/checkpoints">
-            <NeoButton variant="secondary">查看關卡</NeoButton>
+          <Link to="/map">
+            <NeoButton variant="secondary">查看地圖</NeoButton>
           </Link>
         </div>
       </NeoCard>

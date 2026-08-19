@@ -15,6 +15,7 @@ import { FinalResultPage } from "./pages/FinalResultPage";
 import { LandingPage } from "./pages/LandingPage";
 import { LoadingPage } from "./pages/LoadingPage";
 import { LoginPage } from "./pages/LoginPage";
+import { MapPage } from "./pages/MapPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { QuizPage } from "./pages/QuizPage";
 import { RedeemManagementPage } from "./pages/RedeemManagementPage";
@@ -68,6 +69,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/map" element={<MapPage />} />
         <Route path="/loading" element={<LoadingPage />} />
         <Route path="/error" element={<ErrorPage />} />
         <Route path="/unlock/:levelId" element={<UnlockPage />} />
