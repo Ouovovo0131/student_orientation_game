@@ -53,7 +53,7 @@ export const CHECKPOINTS: Checkpoint[] = [
     id: "stage-05",
     title: "關卡 5：智慧神殿 | 教務處",
     description: "認識學校提供的各項資源，影片尾聲會出現快問快答。",
-    videoUrl: "https://youtu.be/7o4Z9C5wk2U?si=Y_l3K94dH5uoP2WH",
+    videoUrl: "https://youtube.com/shorts/U1Wvt9zSEv0?feature=share",
     quiz: {
       prompt: "本關介紹的是哪一類資源？",
       options: ["校園資源與服務", "戶外運動課", "後勤採購", "校外實習"],
@@ -75,7 +75,7 @@ export const CHECKPOINTS: Checkpoint[] = [
   },
   {
     id: "stage-07",
-    title: "關卡 7：萬卷禁庫書",
+    title: "關卡 7：萬卷禁庫書 | 圖資大樓",
     description: "從影片中了解校園生活適應方式，請回答問題。",
     videoUrl: "https://youtu.be/eTqa78gU5B8?si=jcTPq567jNP5KYe_",
     quiz: {
