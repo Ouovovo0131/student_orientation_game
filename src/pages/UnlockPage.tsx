@@ -5,10 +5,12 @@ import {
   resolveCheckpointId,
   unlockCheckpointLocally,
 } from "../utils/checkpointUnlock";
+import { useGame } from "../hooks/useGame";
 
 export function UnlockPage() {
   const { levelId } = useParams();
   const navigate = useNavigate();
+  const { uid, syncUnlockedStages } = useGame();
 
   useEffect(() => {
     const stageId = resolveCheckpointId(levelId);
@@ -18,18 +20,24 @@ export function UnlockPage() {
     }
 
     unlockCheckpointLocally(stageId);
-    const checkpointNumber = getCheckpointNumber(stageId);
-    const search = new URLSearchParams({
-      focus: stageId,
-      mode: "unlock",
-    });
+    void (async () => {
+      if (uid) {
+        await syncUnlockedStages([stageId]);
+      }
 
-    if (checkpointNumber) {
-      search.set("justUnlocked", checkpointNumber);
-    }
+      const checkpointNumber = getCheckpointNumber(stageId);
+      const search = new URLSearchParams({
+        focus: stageId,
+        mode: "unlock",
+      });
 
-    navigate(`/checkpoints?${search.toString()}`, { replace: true });
-  }, [levelId, navigate]);
+      if (checkpointNumber) {
+        search.set("justUnlocked", checkpointNumber);
+      }
+
+      navigate(`/checkpoints?${search.toString()}`, { replace: true });
+    })();
+  }, [levelId, navigate, syncUnlockedStages, uid]);
 
   return null;
 }

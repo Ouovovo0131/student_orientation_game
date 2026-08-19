@@ -64,6 +64,7 @@ export interface GameContextValue {
   loginWithSchoolAccount: () => Promise<void>;
   logout: () => Promise<void>;
   refreshPlayer: () => Promise<void>;
+  syncUnlockedStages: (stageIds: StageId[]) => Promise<void>;
   refreshRedeemControl: () => Promise<void>;
   setRedeemControl: (payload: RedeemControl) => Promise<void>;
   completeCheckpoint: (stageId: StageId) => Promise<void>;

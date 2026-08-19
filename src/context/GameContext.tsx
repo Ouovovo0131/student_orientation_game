@@ -17,7 +17,9 @@ import {
   requestRedeemTicket,
   redeem,
   updateRedeemControl,
+  syncUnlockedStages as syncUnlockedStagesInFirestore,
 } from "../services/gameApi";
+import { getLocallyUnlockedStages } from "../utils/checkpointUnlock";
 import type { GameContextValue, PlayerState, RedeemControl, StageId, UserProfile } from "../types";
 
 export const GameContext = createContext<GameContextValue | null>(null);
@@ -87,6 +89,14 @@ export function GameProvider({ children }: PropsWithChildren) {
       return;
     }
     const data = await withTask("同步最新闖關進度中", () => getPlayerState(uid));
+    const locallyUnlockedStages = getLocallyUnlockedStages();
+    if (locallyUnlockedStages.length > 0) {
+      const synchronizedState = await withTask("同步掃碼解鎖關卡中", () =>
+        syncUnlockedStagesInFirestore(uid, locallyUnlockedStages),
+      );
+      setPlayer(synchronizedState);
+      return;
+    }
     setPlayer(data);
   }, [uid, withTask]);
 
@@ -103,8 +113,11 @@ export function GameProvider({ children }: PropsWithChildren) {
     localStorage.setItem("orientation_uid", currentUid);
     setUid(currentUid);
     const state = await withTask("登入成功，檢查玩家資料（不存在則自動建立）", () => getPlayerState(currentUid));
+    const synchronizedState = await withTask("同步掃碼解鎖關卡中", () =>
+      syncUnlockedStagesInFirestore(currentUid, getLocallyUnlockedStages()),
+    );
     const control = await withTask("同步兌換開放狀態中", () => getRedeemControl(currentUid));
-    setPlayer(state);
+    setPlayer(synchronizedState ?? state);
     setRedeemControlState(control);
   }, [withTask]);
 
@@ -136,6 +149,14 @@ export function GameProvider({ children }: PropsWithChildren) {
     [uid, withTask],
   );
 
+  const syncUnlockedStages = useCallback(async (stageIds: StageId[]) => {
+    if (!uid || stageIds.length === 0) {
+      return;
+    }
+    const state = await withTask("同步掃碼解鎖關卡中", () => syncUnlockedStagesInFirestore(uid, stageIds));
+    setPlayer(state);
+  }, [uid, withTask]);
+
   const redeemReward = useCallback(async () => {
     if (!uid) {
       throw new Error("尚未登入，無法兌換獎勵。請先登入。");
@@ -165,6 +186,7 @@ export function GameProvider({ children }: PropsWithChildren) {
       loginWithSchoolAccount,
       logout,
       refreshPlayer,
+      syncUnlockedStages,
       refreshRedeemControl,
       setRedeemControl,
       completeCheckpoint,
@@ -182,6 +204,7 @@ export function GameProvider({ children }: PropsWithChildren) {
       loginWithSchoolAccount,
       logout,
       refreshPlayer,
+      syncUnlockedStages,
       refreshRedeemControl,
       setRedeemControl,
       completeCheckpoint,

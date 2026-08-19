@@ -13,7 +13,10 @@ import { CHECKPOINTS } from "../assets/checkpoints";
 import { getFirebaseAuth, getFirebaseDb } from "../firebase/client";
 import type { PlayerRole, PlayerState, RedeemControl, RedeemStats, StageId } from "../types";
 import { isStageUnlocked } from "../utils/checkpointAccess";
-import { isCheckpointLocallyUnlocked } from "../utils/checkpointUnlock";
+import {
+  getLocallyUnlockedStages,
+  isCheckpointLocallyUnlocked,
+} from "../utils/checkpointUnlock";
 
 const PLAYERS_COLLECTION = "players";
 const ADMINS_COLLECTION = "admins";
@@ -521,6 +524,31 @@ export async function getRedeemStats(uid: string, totalCheckpoints: number): Pro
       waitingRedeemPlayers,
       requestedAccounts,
     };
+  } catch (error) {
+    throw mapFirebaseError(error);
+  }
+}
+
+export async function syncUnlockedStages(uid: string, stageIds: StageId[]): Promise<PlayerState> {
+  await getCurrentIdentity(uid);
+  const ref = getPlayerRef(uid);
+  const uniqueStageIds = Array.from(new Set(stageIds));
+
+  try {
+    await runTransaction(getFirebaseDb(), async (transaction) => {
+      const snapshot = await transaction.get(ref);
+      const current = normalizePlayerState(snapshot.data());
+      const nextUnlockedStages = { ...current.unlockedStages };
+
+      for (const stageId of uniqueStageIds) {
+        nextUnlockedStages[stageId] = true;
+      }
+
+      transaction.set(ref, { unlockedStages: nextUnlockedStages }, { merge: true });
+    });
+
+    const next = await getDoc(ref);
+    return normalizePlayerState(next.data());
   } catch (error) {
     throw mapFirebaseError(error);
   }
