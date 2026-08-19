@@ -7,7 +7,7 @@ const SYSTEM = "system";
 const UID_COUNTER_DOC = "playerUidCounter";
 const START_PLAYER_UID = 11500001;
 const TEST_PLAYER_EMAIL = "cheiling0131@gmail.com";
-const ADMIN_EMAILS = new Set(["s310165@hlhs.hlc.edu.tw"]);
+const ADMIN_EMAILS = new Set(["s310165@hlhs.hlc.edu.tw", "s410337@hlhs.hlc.edu.tw"]);
 
 interface DecodedIdentity {
   uid: string;

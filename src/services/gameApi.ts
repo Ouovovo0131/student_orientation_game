@@ -22,7 +22,7 @@ const PLAYERS_COLLECTION = "players";
 const ADMINS_COLLECTION = "admins";
 const SYSTEM_COLLECTION = "system";
 const REDEEM_CONTROL_DOCUMENT = "redeemControl";
-const ADMIN_EMAILS = ["s310165@hlhs.hlc.edu.tw"];
+const ADMIN_EMAILS = ["s310165@hlhs.hlc.edu.tw", "s410337@hlhs.hlc.edu.tw"];
 
 const DEFAULT_REDEEM_CONTROL: RedeemControl = {
   isOpen: false,

@@ -128,6 +128,11 @@ function getYouTubeVideoId(url: string): string | null {
       if (embedIndex >= 0 && segments[embedIndex + 1]) {
         return segments[embedIndex + 1];
       }
+
+      const shortsIndex = segments.indexOf("shorts");
+      if (shortsIndex >= 0 && segments[shortsIndex + 1]) {
+        return segments[shortsIndex + 1];
+      }
     }
   } catch {
     return null;

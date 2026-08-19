@@ -24,7 +24,7 @@ service cloud.firestore {
     function isAdmin() {
       return isSignedIn()
         && (
-          request.auth.token.email == 's310165@hlhs.hlc.edu.tw' || 's410337@hlhs.hlc.edu.tw'
+          request.auth.token.email == 's310165@hlhs.hlc.edu.tw' || request.auth.token.email == 's410337@hlhs.hlc.edu.tw'
           || exists(/databases/$(database)/documents/admins/$(request.auth.uid))
         );
     }
