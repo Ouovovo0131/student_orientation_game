@@ -1,4 +1,5 @@
-import { ArrowLeft, LogOut, UserRound } from "lucide-react";
+import { ArrowLeft, LogOut, Settings, UserRound } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { PageContainer } from "../components/layout/PageContainer";
 import { NeoButton } from "../components/ui/NeoButton";
@@ -18,6 +19,7 @@ function buildAvatarFallback(nameOrEmail: string): string {
 export function AccountPage() {
   const navigate = useNavigate();
   const { userProfile, player, logout, loading } = useGame();
+  const isAdmin = player?.role === "admin";
 
   const displayName = userProfile?.displayName || userProfile?.email || "未命名玩家";
   const email = userProfile?.email || "未取得信箱";
@@ -86,6 +88,27 @@ export function AccountPage() {
           登出
         </NeoButton>
       </NeoCard>
+
+      {isAdmin && (
+        <NeoCard className="mt-4 bg-[#FFF8E8]">
+          <div className="flex items-center gap-2">
+            <Settings size={22} />
+            <h2 className="text-2xl font-black">管理員功能</h2>
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <Link to="/admin/checkpoints">
+              <NeoButton variant="secondary" fullWidth>
+                關卡管理
+              </NeoButton>
+            </Link>
+            <Link to="/admin/redeem">
+              <NeoButton fullWidth>
+                兌換管理
+              </NeoButton>
+            </Link>
+          </div>
+        </NeoCard>
+      )}
     </PageContainer>
   );
 }

@@ -19,16 +19,16 @@ export function LandingPage() {
         <div className="mt-6 flex flex-wrap gap-3">
           {!uid && (
             <Link to="/login">
-              <NeoButton>登入</NeoButton>
+              <NeoButton className="w-full px-8 py-4 text-lg sm:w-auto">登入</NeoButton>
             </Link>
           )}
           {uid && (
             <Link to="/checkpoints">
-              <NeoButton>開始闖關</NeoButton>
+              <NeoButton className="w-full px-8 py-4 text-lg sm:w-auto">開始闖關</NeoButton>
             </Link>
           )}
           <Link to="/map">
-            <NeoButton variant="secondary">查看地圖</NeoButton>
+            <NeoButton variant="secondary" className="w-full px-8 py-4 text-lg sm:w-auto">查看地圖</NeoButton>
           </Link>
         </div>
       </NeoCard>

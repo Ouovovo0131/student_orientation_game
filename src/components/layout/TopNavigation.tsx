@@ -10,8 +10,7 @@ interface TopNavigationProps {
 }
 
 export function TopNavigation({ score, total }: TopNavigationProps) {
-  const { uid, player } = useGame();
-  const isAdmin = player?.role === "admin";
+  const { uid } = useGame();
 
   return (
     <header className="sticky top-0 z-30 border-b-4 border-black bg-[#FFF6D6]">
@@ -22,21 +21,6 @@ export function TopNavigation({ score, total }: TopNavigationProps) {
         </Link>
         <div className="flex items-center gap-3">
           <NeoBadge tone="info">分數 {score} / {total}</NeoBadge>
-          {player?.playerUid && <NeoBadge tone="success">玩家 UID {player.playerUid}</NeoBadge>}
-          {uid && isAdmin && (
-            <>
-              <Link to="/admin/checkpoints">
-                <NeoButton variant="secondary" className="min-h-0 px-3 py-2 text-sm">
-                  關卡管理
-                </NeoButton>
-              </Link>
-              <Link to="/admin/redeem">
-                <NeoButton variant="primary" className="min-h-0 px-3 py-2 text-sm">
-                  兌換管理
-                </NeoButton>
-              </Link>
-            </>
-          )}
           {uid && (
             <Link to="/account">
               <NeoButton variant="secondary" className="min-h-0 px-3 py-2 text-sm">

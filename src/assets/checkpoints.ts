@@ -67,8 +67,8 @@ export const CHECKPOINTS: Checkpoint[] = [
     description: "了解學習與輔導資源，完成後會自動開啟下一關。",
     videoUrl: "https://youtu.be/WqubInH-2KY?si=0gmCXwdOiteLGZro",
     quiz: {
-      prompt: "本關的重點是什麼？",
-      options: ["學習支持與輔導", "餐廳營業時間", "交通資訊", "考試時程"],
+      prompt: "高一學創老師是？",
+      options: ["陳德剛老師 + 王清平老師", "餐廳營業時間", "交通資訊", "考試時程"],
       answerIndex: 0,
       explanation: "本關聚焦學習支持與輔導資源。",
     },
