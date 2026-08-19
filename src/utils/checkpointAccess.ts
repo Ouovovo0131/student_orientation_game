@@ -3,8 +3,6 @@ import { isCheckpointLocallyUnlocked } from "./checkpointUnlock";
 
 export type CheckpointAccessStatus = "locked" | "unlocked" | "completed";
 
-const FIRST_STAGE_ID = "stage-01" as StageId;
-
 interface CheckpointAccessInput {
   completed: boolean;
   unlocked: boolean;
@@ -27,10 +25,6 @@ export function isStageUnlocked(
   unlockedStages: Record<StageId, boolean> | undefined,
   completedStages: Record<StageId, boolean> | undefined,
 ): boolean {
-  if (stageId === FIRST_STAGE_ID) {
-    return true;
-  }
-
   if (Boolean(completedStages?.[stageId])) {
     return true;
   }
