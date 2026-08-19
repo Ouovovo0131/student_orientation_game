@@ -75,18 +75,6 @@ export function RedeemPage() {
       {canRedeemNow && (
         <NeoCard className="bg-[#E8FFF1]">
           <div className="relative overflow-hidden border-4 border-black bg-white p-5">
-            {!requested && (
-              <div className="pointer-events-none absolute inset-0">
-                <span className="confetti-piece left-[8%] bg-[#ff6a6a]" />
-                <span className="confetti-piece left-[20%] bg-[#ffd644] [animation-delay:0.1s]" />
-                <span className="confetti-piece left-[34%] bg-[#3bea7d] [animation-delay:0.22s]" />
-                <span className="confetti-piece left-[48%] bg-[#8dd8ff] [animation-delay:0.3s]" />
-                <span className="confetti-piece left-[60%] bg-[#ff9f1a] [animation-delay:0.4s]" />
-                <span className="confetti-piece left-[72%] bg-[#ff6a6a] [animation-delay:0.52s]" />
-                <span className="confetti-piece left-[84%] bg-[#3bea7d] [animation-delay:0.62s]" />
-              </div>
-            )}
-
             <h1 className="relative text-3xl font-black">你可以兌換獎品了</h1>
             <p className="relative mt-3 text-base">
               {requested
