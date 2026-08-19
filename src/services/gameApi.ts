@@ -15,7 +15,6 @@ import type { PlayerRole, PlayerState, RedeemControl, RedeemStats, StageId } fro
 import { isStageUnlocked } from "../utils/checkpointAccess";
 import {
   getLocallyUnlockedStages,
-  isCheckpointLocallyUnlocked,
 } from "../utils/checkpointUnlock";
 
 const PLAYERS_COLLECTION = "players";
@@ -272,12 +271,6 @@ export async function getPlayerState(uid: string): Promise<PlayerState> {
   }
 }
 
-function getNextStageId(stageId: StageId): StageId | null {
-  const index = CHECKPOINTS.findIndex((checkpoint) => checkpoint.id === stageId);
-  const nextCheckpoint = CHECKPOINTS[index + 1];
-  return nextCheckpoint?.id ?? null;
-}
-
 export async function completeStage(uid: string, stageId: StageId): Promise<PlayerState> {
   await getCurrentIdentity(uid);
   const ref = getPlayerRef(uid);
@@ -299,25 +292,11 @@ export async function completeStage(uid: string, stageId: StageId): Promise<Play
         ...current.completedStages,
         [stageId]: true,
       };
-      const nextUnlockedStages = {
-        ...current.unlockedStages,
-      };
-
-      if (isCheckpointLocallyUnlocked(stageId)) {
-        nextUnlockedStages[stageId] = true;
-      }
-
-      const nextStageId = getNextStageId(stageId);
-      if (nextStageId) {
-        nextUnlockedStages[nextStageId] = true;
-      }
-
       transaction.set(
         ref,
         {
           score: Object.values(nextCompletedStages).filter(Boolean).length,
           completedStages: nextCompletedStages,
-          unlockedStages: nextUnlockedStages,
         },
         { merge: true },
       );
