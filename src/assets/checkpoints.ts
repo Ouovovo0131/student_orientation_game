@@ -41,7 +41,7 @@ export const CHECKPOINTS: Checkpoint[] = [
     id: "stage-04",
     title: "關卡 4：花中地下城 | 合作社",
     description: "透過影片了解活動與活動流程，完成後即可繼續闖關。",
-    videoUrl: "https://youtu.be/eTqa78gU5B8?si=jcTPq567jNP5KYe_",
+    videoUrl: "https://www.youtube.com/shorts/L8xpO3aQ0Pw",
     quiz: {
       prompt: "本關最重要的內容是什麼？",
       options: ["活動流程與體驗", "課堂安排", "補考規則", "社團經費"],
@@ -53,7 +53,7 @@ export const CHECKPOINTS: Checkpoint[] = [
     id: "stage-05",
     title: "關卡 5：智慧神殿 | 教務處",
     description: "認識學校提供的各項資源，影片尾聲會出現快問快答。",
-    videoUrl: "https://youtube.com/shorts/U1Wvt9zSEv0?feature=share",
+    videoUrl: "https://www.youtube.com/shorts/U1Wvt9zSEv0",
     quiz: {
       prompt: "本關介紹的是哪一類資源？",
       options: ["校園資源與服務", "戶外運動課", "後勤採購", "校外實習"],
