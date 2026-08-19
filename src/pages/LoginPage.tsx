@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { PageContainer } from "../components/layout/PageContainer";
 import { NeoButton } from "../components/ui/NeoButton";
 import { NeoCard } from "../components/ui/NeoCard";
@@ -7,16 +7,18 @@ import { useGame } from "../hooks/useGame";
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { loginWithSchoolAccount, loading, player, uid } = useGame();
+  const destination = typeof location.state?.from === "string" ? location.state.from : "/checkpoints";
 
   const schoolDomain = "@hlhs.hlc.edu.tw";
   const testAccount = "cheiling0131@gmail.com";
 
   useEffect(() => {
     if (uid && player) {
-      navigate("/checkpoints", { replace: true });
+      navigate(destination, { replace: true });
     }
-  }, [uid, player, navigate]);
+  }, [destination, uid, player, navigate]);
 
   return (
     <PageContainer className="max-w-xl">

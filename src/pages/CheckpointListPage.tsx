@@ -7,6 +7,7 @@ import { NeoProgress } from "../components/ui/NeoProgress";
 import { SectionTitle } from "../components/ui/SectionTitle";
 import { useGame } from "../hooks/useGame";
 import { getStageAccessStatus } from "../utils/checkpointAccess";
+import { resolveCheckpointId } from "../utils/checkpointUnlock";
 
 export function CheckpointListPage() {
   const { player, totalCheckpoints, refreshPlayer, uid } = useGame();
@@ -15,8 +16,9 @@ export function CheckpointListPage() {
   const [focusedStageId, setFocusedStageId] = useState<string | null>(null);
 
   const search = useMemo(() => new URLSearchParams(location.search), [location.search]);
-  const focusStageId = search.get("focus");
-  const focusMode = search.get("mode");
+  const justUnlockedStageId = resolveCheckpointId(search.get("justUnlocked") ?? undefined);
+  const focusStageId = justUnlockedStageId ?? search.get("focus");
+  const focusMode = justUnlockedStageId ? "unlock" : search.get("mode");
 
   useEffect(() => {
     if (uid) {

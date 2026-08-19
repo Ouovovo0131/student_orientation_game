@@ -19,6 +19,7 @@ import { NotFoundPage } from "./pages/NotFoundPage";
 import { QuizPage } from "./pages/QuizPage";
 import { RedeemManagementPage } from "./pages/RedeemManagementPage";
 import { RedeemPage } from "./pages/RedeemPage";
+import { UnlockPage } from "./pages/UnlockPage";
 import { VideoPage } from "./pages/VideoPage";
 
 function ProtectedRoute({ children }: { children: ReactElement }) {
@@ -26,7 +27,7 @@ function ProtectedRoute({ children }: { children: ReactElement }) {
   const location = useLocation();
 
   if (!uid) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+    return <Navigate to="/login" replace state={{ from: `${location.pathname}${location.search}` }} />;
   }
   return children;
 }
@@ -69,6 +70,7 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/loading" element={<LoadingPage />} />
         <Route path="/error" element={<ErrorPage />} />
+        <Route path="/unlock/:levelId" element={<UnlockPage />} />
         <Route
           path="/account"
           element={

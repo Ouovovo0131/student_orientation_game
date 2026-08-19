@@ -1,4 +1,5 @@
 import type { StageId } from "../types";
+import { isCheckpointLocallyUnlocked } from "./checkpointUnlock";
 
 export type CheckpointAccessStatus = "locked" | "unlocked" | "completed";
 
@@ -34,7 +35,7 @@ export function isStageUnlocked(
     return true;
   }
 
-  return Boolean(unlockedStages?.[stageId]);
+  return Boolean(unlockedStages?.[stageId]) || isCheckpointLocallyUnlocked(stageId);
 }
 
 export function getStageAccessStatus(

@@ -116,7 +116,9 @@ service cloud.firestore {
         && request.resource.data.completedStages.values().hasOnly([true])
         && request.resource.data.completedStages.keys().hasOnly(
           resource.data.completedStages.keys().concat(
-            resource.data.unlockedStages.keys().concat(['stage-01'])
+            resource.data.unlockedStages.keys().concat(
+              request.resource.data.unlockedStages.keys().concat(['stage-01'])
+            )
           )
         )
         && (

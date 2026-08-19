@@ -3,7 +3,7 @@ import type { Checkpoint } from "../types";
 export const CHECKPOINTS: Checkpoint[] = [
   {
     id: "stage-01",
-    title: "關卡 1：新生導覽",
+    title: "關卡 1：疾風競技場 | 體育組",
     description: "這是新生闖關的起點，影片結束後請完成快問快答。",
     videoUrl: "https://youtu.be/eTqa78gU5B8?si=jcTPq567jNP5KYe_",
     quiz: {
@@ -15,7 +15,7 @@ export const CHECKPOINTS: Checkpoint[] = [
   },
   {
     id: "stage-02",
-    title: "關卡 2：校園規則",
+    title: "關卡 2：生命聖殿 | 保健室",
     description: "了解校園生活的基本規則，完成後即可解鎖下一關。",
     videoUrl: "https://youtu.be/7o4Z9C5wk2U?si=Y_l3K94dH5uoP2WH",
     quiz: {
@@ -27,7 +27,7 @@ export const CHECKPOINTS: Checkpoint[] = [
   },
   {
     id: "stage-03",
-    title: "關卡 3：資訊服務",
+    title: "關卡 3：心靈迷宮 | 輔導室",
     description: "認識學校資訊系統與服務入口，請完成快問快答。",
     videoUrl: "https://youtu.be/WqubInH-2KY?si=0gmCXwdOiteLGZro",
     quiz: {
@@ -39,7 +39,7 @@ export const CHECKPOINTS: Checkpoint[] = [
   },
   {
     id: "stage-04",
-    title: "關卡 4：活動體驗",
+    title: "關卡 4：勇者補給站 | 合作社",
     description: "透過影片了解活動與活動流程，完成後即可繼續闖關。",
     videoUrl: "https://youtu.be/eTqa78gU5B8?si=jcTPq567jNP5KYe_",
     quiz: {
@@ -51,7 +51,7 @@ export const CHECKPOINTS: Checkpoint[] = [
   },
   {
     id: "stage-05",
-    title: "關卡 5：資源介紹",
+    title: "關卡 5：智慧神殿 | 教務處",
     description: "認識學校提供的各項資源，影片尾聲會出現快問快答。",
     videoUrl: "https://youtu.be/7o4Z9C5wk2U?si=Y_l3K94dH5uoP2WH",
     quiz: {
@@ -63,7 +63,7 @@ export const CHECKPOINTS: Checkpoint[] = [
   },
   {
     id: "stage-06",
-    title: "關卡 6：學習支持",
+    title: "關卡 6：秩序裁決所 | 學務處",
     description: "了解學習與輔導資源，完成後會自動開啟下一關。",
     videoUrl: "https://youtu.be/WqubInH-2KY?si=0gmCXwdOiteLGZro",
     quiz: {
@@ -75,7 +75,7 @@ export const CHECKPOINTS: Checkpoint[] = [
   },
   {
     id: "stage-07",
-    title: "關卡 7：生活適應",
+    title: "關卡 7：萬卷禁庫書",
     description: "從影片中了解校園生活適應方式，請回答問題。",
     videoUrl: "https://youtu.be/eTqa78gU5B8?si=jcTPq567jNP5KYe_",
     quiz: {
@@ -83,18 +83,6 @@ export const CHECKPOINTS: Checkpoint[] = [
       options: ["生活適應與自我管理", "校車時刻表", "教師評鑑", "社團比賽"],
       answerIndex: 0,
       explanation: "這一關在幫助新生適應校園生活。",
-    },
-  },
-  {
-    id: "stage-08",
-    title: "關卡 8：畢業前導",
-    description: "最後一關綜合新生的學習與生活準備，完成後即完成挑戰。",
-    videoUrl: "https://youtu.be/7o4Z9C5wk2U?si=Y_l3K94dH5uoP2WH",
-    quiz: {
-      prompt: "最後一關的重心是什麼？",
-      options: ["整體準備與前導", "宿舍申請", "社團選舉", "活動補助"],
-      answerIndex: 0,
-      explanation: "最後一關是綜合性準備與前導說明。",
     },
   },
 ];

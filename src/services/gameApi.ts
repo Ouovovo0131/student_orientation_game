@@ -13,6 +13,7 @@ import { CHECKPOINTS } from "../assets/checkpoints";
 import { getFirebaseAuth, getFirebaseDb } from "../firebase/client";
 import type { PlayerRole, PlayerState, RedeemControl, RedeemStats, StageId } from "../types";
 import { isStageUnlocked } from "../utils/checkpointAccess";
+import { isCheckpointLocallyUnlocked } from "../utils/checkpointUnlock";
 
 const PLAYERS_COLLECTION = "players";
 const ADMINS_COLLECTION = "admins";
@@ -298,6 +299,10 @@ export async function completeStage(uid: string, stageId: StageId): Promise<Play
       const nextUnlockedStages = {
         ...current.unlockedStages,
       };
+
+      if (isCheckpointLocallyUnlocked(stageId)) {
+        nextUnlockedStages[stageId] = true;
+      }
 
       const nextStageId = getNextStageId(stageId);
       if (nextStageId) {
