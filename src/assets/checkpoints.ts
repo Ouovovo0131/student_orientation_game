@@ -39,7 +39,7 @@ export const CHECKPOINTS: Checkpoint[] = [
   },
   {
     id: "stage-04",
-    title: "關卡 4：勇者補給站 | 合作社",
+    title: "關卡 4：花中地下城 | 合作社",
     description: "透過影片了解活動與活動流程，完成後即可繼續闖關。",
     videoUrl: "https://youtu.be/eTqa78gU5B8?si=jcTPq567jNP5KYe_",
     quiz: {
