@@ -8,7 +8,7 @@ export const CHECKPOINTS: Checkpoint[] = [
     videoUrl: "https://youtu.be/eTqa78gU5B8?si=jcTPq567jNP5KYe_",
     quiz: {
       prompt: "以下關於體育組的資訊哪像正確？",
-      options: ["游泳佔比相對來說比較重", "四樓為音樂教室以及社團辦公室", "四樓為音樂教室", "進到體育組要從左側門口進入"],
+      options: ["A: 游泳佔比相對來說比較重", "B: 四樓為音樂教室以及社團辦公室", "C: 四樓為音樂教室", "D: 進到體育組要從左側門口進入"],
       answerIndex: 0,
       explanation: "四樓為美術教室、進體育組要從右側門口進入、游泳很重要!!!。",
     },
@@ -20,7 +20,7 @@ export const CHECKPOINTS: Checkpoint[] = [
     videoUrl: "https://youtu.be/7o4Z9C5wk2U?si=Y_l3K94dH5uoP2WH",
     quiz: {
       prompt: "以下關於健康中心的資訊哪項錯誤？",
-      options: ["健康中心沒開門要在門口等阿姨來", "校安專線是03-8242601", "健康中心製冰機的冰不能吃", "需要借口罩可以到健康中心借"],
+      options: ["A: 健康中心沒開門要在門口等阿姨來", "B: 校安專線是03-8242601", "C: 健康中心製冰機的冰不能吃", "D: 需要借口罩可以到健康中心借"],
       answerIndex: 0,
       explanation: "健康中心沒開門要去學務處請老師幫忙。",
     },
@@ -32,7 +32,7 @@ export const CHECKPOINTS: Checkpoint[] = [
     videoUrl: "https://youtu.be/WqubInH-2KY?si=0gmCXwdOiteLGZro",
     quiz: {
       prompt: "輔導室位在校園哪一棟第幾層？",
-      options: ["和平樓2樓", "綜合大樓1樓", "和平樓三樓", "仁愛樓3樓"],
+      options: ["A: 和平樓2樓", "B: 綜合大樓1樓", "C: 和平樓三樓", "D: 仁愛樓3樓"],
       answerIndex: 2,
       explanation: "輔導室在和平樓的三樓(大導辦樓上)。",
     },
@@ -44,7 +44,7 @@ export const CHECKPOINTS: Checkpoint[] = [
     videoUrl: "https://www.youtube.com/shorts/L8xpO3aQ0Pw",
     quiz: {
       prompt: "以下關於合作社的資訊哪項錯誤？",
-      options: ["有零食飲料可以購買", "購物前須要先準備好零錢", "購物完要走走道離開", "合作社阿姨人很兇"],
+      options: ["A: 有零食飲料可以購買", "B: 購物前須要先準備好零錢", "C: 購物完要走走道離開", "D: 合作社阿姨人很兇"],
       answerIndex: 3,
       explanation: "阿姨一定是最~有耐心脾氣最好的姐姐。",
     },
@@ -56,7 +56,7 @@ export const CHECKPOINTS: Checkpoint[] = [
     videoUrl: "https://www.youtube.com/shorts/U1Wvt9zSEv0",
     quiz: {
       prompt: "教務處有甚麼組別？",
-      options: ["訓育組", "衛生組", "註冊組", "體育組"],
+      options: ["A: 訓育組", "B: 衛生組", "C: 註冊組", "D: 體育組"],
       answerIndex: 2,
       explanation: "訓育組以及衛生組是學務處的。",
     },
@@ -68,7 +68,7 @@ export const CHECKPOINTS: Checkpoint[] = [
     videoUrl: "https://youtu.be/WqubInH-2KY?si=0gmCXwdOiteLGZro",
     quiz: {
       prompt: "高一學創老師是？",
-      options: ["陳德剛老師 + 王清平老師", "陳德剛老師 + 李婕老師", "陳德剛老師 + 劉俊恩老師", "陳德剛老師 + 李曉薇老師"],
+      options: ["A: 陳德剛老師 + 王清平老師", "B: 陳德剛老師 + 李婕老師", "C: 陳德剛老師 + 劉俊恩老師", "D: 陳德剛老師 + 李曉薇老師"],
       answerIndex: 0,
       explanation: "高一的學創老師記清楚，是德剛老師跟清平老師喔。",
     },
@@ -80,7 +80,7 @@ export const CHECKPOINTS: Checkpoint[] = [
     videoUrl: "https://youtu.be/eTqa78gU5B8?si=jcTPq567jNP5KYe_",
     quiz: {
       prompt: "以下關於圖書館的資訊哪項錯誤？",
-      options: ["可以自習k書", "舉辦花中文學獎", "參加數學奧林匹亞培訓", "詢問段考、總成績"],
+      options: ["A: 可以自習k書", "B: 舉辦花中文學獎", "C: 參加數學奧林匹亞培訓", "D: 詢問段考、總成績"],
       answerIndex: 3,
       explanation: "段考跟成績是教務處的業務喔。",
     },
