@@ -17,7 +17,7 @@ export const CHECKPOINTS: Checkpoint[] = [
     id: "stage-02",
     title: "關卡 2：生命聖殿 | 健康中心",
     description: "傷病處理、健康檢查與衛生教育。",
-    videoUrl: "https://youtu.be/7o4Z9C5wk2U?si=Y_l3K94dH5uoP2WH",
+    videoUrl: "https://youtu.be/ten8SuISPVg",
     quiz: {
       prompt: "以下關於健康中心的資訊哪項錯誤？",
       options: ["A: 健康中心沒開門要在門口等阿姨來", "B: 校安專線是03-8242601", "C: 健康中心製冰機的冰不能吃", "D: 需要借口罩可以到健康中心借"],
@@ -29,7 +29,7 @@ export const CHECKPOINTS: Checkpoint[] = [
     id: "stage-03",
     title: "關卡 3：心靈迷宮 | 輔導室",
     description: "心理諮商與生涯發展指引。",
-    videoUrl: "https://youtu.be/WqubInH-2KY?si=0gmCXwdOiteLGZro",
+    videoUrl: "https://www.youtube.com/watch?v=K-egIu6O9AI",
     quiz: {
       prompt: "輔導室位在校園哪一棟第幾層？",
       options: ["A: 和平樓2樓", "B: 綜合大樓1樓", "C: 和平樓三樓", "D: 仁愛樓3樓"],
@@ -53,7 +53,7 @@ export const CHECKPOINTS: Checkpoint[] = [
     id: "stage-05",
     title: "關卡 5：智慧神殿 | 教務處",
     description: "統籌課程規劃、考試成績與升學事務。",
-    videoUrl: "https://www.youtube.com/shorts/U1Wvt9zSEv0",
+    videoUrl: "https://www.youtube.com/shorts/I-lSbYZOFLI",
     quiz: {
       prompt: "教務處有甚麼組別？",
       options: ["A: 訓育組", "B: 衛生組", "C: 註冊組", "D: 體育組"],
@@ -77,7 +77,7 @@ export const CHECKPOINTS: Checkpoint[] = [
     id: "stage-07",
     title: "關卡 7：萬卷禁庫書 | 圖書館",
     description: "提供豐富藏書、寧靜的自習空間與資訊檢索服務。",
-    videoUrl: "https://youtu.be/eTqa78gU5B8?si=jcTPq567jNP5KYe_",
+    videoUrl: "https://www.youtube.com/watch?v=hlZI3T-rOcQ",
     quiz: {
       prompt: "以下關於圖書館的資訊哪項錯誤？",
       options: ["A: 可以報名晚自習", "B: 可以報名圖書館志工", "C: 可以報名午間師生讀書會", "D: 借書不用帶學生證"],
