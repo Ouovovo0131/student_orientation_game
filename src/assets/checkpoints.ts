@@ -82,7 +82,7 @@ export const CHECKPOINTS: Checkpoint[] = [
       prompt: "以下關於圖書館的資訊哪項錯誤？",
       options: ["A: 可以報名晚自習", "B: 可以報名圖書館志工", "C: 可以報名午間師生讀書會", "D: 借書不用帶學生證"],
       answerIndex: 3,
-      explanation: "借書一定要帶學生證。",
+      explanation: "借書一定要帶學生證，圖書館的晚自習、志工、午間師生讀書會都可以報名參加。",
     },
   },
 ];
