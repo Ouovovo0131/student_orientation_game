@@ -44,9 +44,9 @@ export const CHECKPOINTS: Checkpoint[] = [
     videoUrl: "https://www.youtube.com/shorts/L8xpO3aQ0Pw",
     quiz: {
       prompt: "以下關於合作社的資訊哪項錯誤？",
-      options: ["A: 有零食飲料可以購買", "B: 購物前須要先準備好零錢", "C: 購物完要走走道離開", "D: 合作社阿姨人很兇"],
+      options: ["A: 有零食飲料可以購買", "B: 購物前須要先準備好零錢", "C: 購物完要走走道離開", "D: 購買商品時不需穿校服"],
       answerIndex: 3,
-      explanation: "阿姨一定是最~有耐心脾氣最好的姐姐。",
+      explanation: "去合作社一定要穿校服。",
     },
   },
   {
@@ -67,10 +67,10 @@ export const CHECKPOINTS: Checkpoint[] = [
     description: "生活常規、社團活動與校園安全。",
     videoUrl: "https://youtu.be/WqubInH-2KY?si=0gmCXwdOiteLGZro",
     quiz: {
-      prompt: "高一學創老師是？",
-      options: ["A: 陳德剛老師 + 王清平老師", "B: 陳德剛老師 + 李婕老師", "C: 陳德剛老師 + 劉俊恩老師", "D: 陳德剛老師 + 李曉薇老師"],
+      prompt: "高一繳交假卡要找哪一位學創老師？",
+      options: ["A: 陳德剛老師", "B: 李婕老師", "C: 劉俊恩老師", "D: 李曉薇老師"],
       answerIndex: 0,
-      explanation: "高一的學創老師記清楚，是德剛老師跟清平老師喔。",
+      explanation: "高一的學創老師要記清楚，是德剛老師跟清平老師。",
     },
   },
   {
@@ -80,9 +80,9 @@ export const CHECKPOINTS: Checkpoint[] = [
     videoUrl: "https://youtu.be/eTqa78gU5B8?si=jcTPq567jNP5KYe_",
     quiz: {
       prompt: "以下關於圖書館的資訊哪項錯誤？",
-      options: ["A: 可以自習k書", "B: 舉辦花中文學獎", "C: 參加數學奧林匹亞培訓", "D: 詢問段考、總成績"],
+      options: ["A: 可以報名晚自習", "B: 可以報名圖書館志工", "C: 可以報名午間師生讀書會", "D: 借書不用帶學生證"],
       answerIndex: 3,
-      explanation: "段考跟成績是教務處的業務喔。",
+      explanation: "借書一定要帶學生證。",
     },
   },
 ];
