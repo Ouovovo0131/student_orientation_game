@@ -4,6 +4,7 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { PageContainer } from "../components/layout/PageContainer";
 import { NeoButton } from "../components/ui/NeoButton";
 import { NeoCard } from "../components/ui/NeoCard";
+import { NeoInput } from "../components/ui/NeoInput";
 import { useCheckpoint } from "../hooks/useCheckpoint";
 import { useGame } from "../hooks/useGame";
 import { getStageAccessStatus } from "../utils/checkpointAccess";
