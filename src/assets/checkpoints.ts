@@ -5,7 +5,7 @@ export const CHECKPOINTS: Checkpoint[] = [
     id: "stage-01",
     title: "關卡 1：疾風競技場 | 體育組",
     description: "體育課程、籌辦運動賽事與管理體育器材。",
-    videoUrl: "https://youtu.be/eTqa78gU5B8?si=jcTPq567jNP5KYe_",
+    videoUrl: "https://www.youtube.com/shorts/zMO90DAdGKw",
     quiz: {
       prompt: "以下關於體育組的資訊哪像正確？",
       options: ["A: 游泳佔比相對來說比較重", "B: 四樓為音樂教室以及社團辦公室", "C: 四樓為音樂教室", "D: 進到體育組要從左側門口進入"],
@@ -41,7 +41,7 @@ export const CHECKPOINTS: Checkpoint[] = [
     id: "stage-04",
     title: "關卡 4：花中地下城 | 合作社",
     description: "餐飲小點、文具用品與不定時刷新的隨機事件。",
-    videoUrl: "https://www.youtube.com/shorts/L8xpO3aQ0Pw",
+    videoUrl: "https://www.youtube.com/watch?v=JhS64xywEE8",
     quiz: {
       prompt: "以下關於合作社的資訊哪項錯誤？",
       options: ["A: 有零食飲料可以購買", "B: 購物前須要先準備好零錢", "C: 購物完要走走道離開", "D: 購買商品時不需穿校服"],
@@ -65,7 +65,7 @@ export const CHECKPOINTS: Checkpoint[] = [
     id: "stage-06",
     title: "關卡 6：秩序裁決所 | 學務處",
     description: "生活常規、社團活動與校園安全。",
-    videoUrl: "https://youtu.be/WqubInH-2KY?si=0gmCXwdOiteLGZro",
+    videoUrl: "https://www.youtube.com/watch?v=ZnECuuwq8ac",
     quiz: {
       prompt: "高一繳交假卡要找哪一位學創老師？",
       options: ["A: 陳德剛老師", "B: 李婕老師", "C: 劉俊恩老師", "D: 李曉薇老師"],
