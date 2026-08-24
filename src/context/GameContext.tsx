@@ -17,6 +17,7 @@ import {
   requestRedeemTicket,
   redeem,
   updateRedeemControl,
+  verifyStagePasscode as verifyStagePasscodeInFirestore,
   syncUnlockedStages as syncUnlockedStagesInFirestore,
 } from "../services/gameApi";
 import { getLocallyUnlockedStages } from "../utils/checkpointUnlock";
@@ -149,6 +150,17 @@ export function GameProvider({ children }: PropsWithChildren) {
     [uid, withTask],
   );
 
+  const verifyStagePasscode = useCallback(
+    async (stageId: StageId, code: string) => {
+      if (!uid) {
+        throw new Error("尚未登入，無法驗證通關密碼。請先登入。");
+      }
+      const state = await withTask("正在驗證通關密碼", () => verifyStagePasscodeInFirestore(uid, stageId, code));
+      setPlayer(state);
+    },
+    [uid, withTask],
+  );
+
   const syncUnlockedStages = useCallback(async (stageIds: StageId[]) => {
     if (!uid || stageIds.length === 0) {
       return;
@@ -190,6 +202,7 @@ export function GameProvider({ children }: PropsWithChildren) {
       refreshRedeemControl,
       setRedeemControl,
       completeCheckpoint,
+      verifyStagePasscode,
       requestRedeemTicket: requestRedeem,
       redeemReward,
     }),
@@ -208,6 +221,7 @@ export function GameProvider({ children }: PropsWithChildren) {
       refreshRedeemControl,
       setRedeemControl,
       completeCheckpoint,
+      verifyStagePasscode,
       requestRedeem,
       redeemReward,
     ],

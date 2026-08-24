@@ -8,12 +8,18 @@ export interface CheckpointQuiz {
   explanation: string;
 }
 
+export interface CheckpointStaffPasscode {
+  instruction: string;
+  staffLabel?: string;
+}
+
 export interface Checkpoint {
   id: StageId;
   title: string;
   description: string;
   videoUrl: string;
   quiz?: CheckpointQuiz;
+  staffPasscode?: CheckpointStaffPasscode;
 }
 
 export interface PlayerState {
@@ -68,6 +74,7 @@ export interface GameContextValue {
   refreshRedeemControl: () => Promise<void>;
   setRedeemControl: (payload: RedeemControl) => Promise<void>;
   completeCheckpoint: (stageId: StageId) => Promise<void>;
+  verifyStagePasscode: (stageId: StageId, code: string) => Promise<void>;
   requestRedeemTicket: () => Promise<void>;
   redeemReward: () => Promise<void>;
 }

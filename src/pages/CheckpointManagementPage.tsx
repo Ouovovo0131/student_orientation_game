@@ -6,8 +6,10 @@ import { NeoButton } from "../components/ui/NeoButton";
 import { NeoCard } from "../components/ui/NeoCard";
 import { NeoInput } from "../components/ui/NeoInput";
 import { useGame } from "../hooks/useGame";
-import { setCheckpointAccess } from "../services/gameApi";
+import { getStagePasscodes, setCheckpointAccess } from "../services/gameApi";
 import { buildStageRange } from "../utils/checkpointAccess";
+
+const STAFF_PASSCODE_STAGES = CHECKPOINTS.filter((checkpoint) => checkpoint.staffPasscode);
 
 export function CheckpointManagementPage() {
   const { uid, player } = useGame();
@@ -17,6 +19,9 @@ export function CheckpointManagementPage() {
   const [markCompleted, setMarkCompleted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [passcodes, setPasscodes] = useState<Record<string, string[]>>({});
+  const [passcodeLoading, setPasscodeLoading] = useState<string | null>(null);
+  const [passcodeMessage, setPasscodeMessage] = useState<string | null>(null);
   const isAdmin = player?.role === "admin";
 
   if (!isAdmin) {
@@ -52,6 +57,26 @@ export function CheckpointManagementPage() {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLoadPasscodes = async (stageId: string) => {
+    if (!uid) {
+      return;
+    }
+
+    setPasscodeLoading(stageId);
+    setPasscodeMessage(null);
+    try {
+      const codes = await getStagePasscodes(uid, stageId);
+      setPasscodes((prev) => ({ ...prev, [stageId]: codes }));
+      if (codes.length === 0) {
+        setPasscodeMessage("此關卡目前沒有設定任何通關密碼，請先在 Firestore 建立。");
+      }
+    } catch (error) {
+      setPasscodeMessage(error instanceof Error ? error.message : "取得通關密碼失敗，請稍後再試。");
+    } finally {
+      setPasscodeLoading(null);
     }
   };
 
@@ -104,6 +129,40 @@ export function CheckpointManagementPage() {
           {message && <p className="text-sm font-bold">{message}</p>}
         </div>
       </NeoCard>
+
+      {STAFF_PASSCODE_STAGES.length > 0 && (
+        <NeoCard className="mt-4">
+          <h2 className="text-xl font-black">現場問答通關密碼</h2>
+          <p className="mt-2 text-sm">供工作人員在學生完成問答後隨機挑一組密碼告知學生。密碼需先在 Firestore 的 checkpointPasscodes 集合建立。</p>
+          <div className="mt-4 grid gap-4">
+            {STAFF_PASSCODE_STAGES.map((checkpoint) => (
+              <div key={checkpoint.id} className="border-4 border-black p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="font-black">{checkpoint.title}</p>
+                  <NeoButton
+                    type="button"
+                    variant="secondary"
+                    disabled={passcodeLoading === checkpoint.id}
+                    onClick={() => void handleLoadPasscodes(checkpoint.id)}
+                  >
+                    {passcodeLoading === checkpoint.id ? "查詢中..." : "顯示可用密碼"}
+                  </NeoButton>
+                </div>
+                {passcodes[checkpoint.id] && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {passcodes[checkpoint.id].map((code) => (
+                      <span key={code} className="border-2 border-black bg-[#FFD644] px-3 py-1 text-sm font-black">
+                        {code}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+          {passcodeMessage && <p className="mt-3 text-sm font-bold">{passcodeMessage}</p>}
+        </NeoCard>
+      )}
     </PageContainer>
   );
 }

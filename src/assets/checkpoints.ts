@@ -18,11 +18,9 @@ export const CHECKPOINTS: Checkpoint[] = [
     title: "關卡 2：生命聖殿 | 健康中心",
     description: "傷病處理、健康檢查與衛生教育。",
     videoUrl: "https://youtu.be/ten8SuISPVg",
-    quiz: {
-      prompt: "以下關於健康中心的資訊哪項錯誤？",
-      options: ["A: 健康中心沒開門要在門口等阿姨來", "B: 校安專線是03-8242601", "C: 健康中心製冰機的冰不能吃", "D: 需要借口罩可以到健康中心借"],
-      answerIndex: 0,
-      explanation: "健康中心沒開門要去學務處請老師幫忙。",
+    staffPasscode: {
+      staffLabel: "健康中心醫療組人員",
+      instruction: "請前往健康中心，向醫療組人員完成 Q&A 問答，並取得通關密碼後在下方輸入完成關卡。",
     },
   },
   {

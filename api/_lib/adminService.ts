@@ -4,6 +4,7 @@ import { getAdminAuth, getDb } from "./firebaseAdmin.js";
 const PLAYERS = "players";
 const ADMINS = "admins";
 const SYSTEM = "system";
+const CHECKPOINT_PASSCODES = "checkpointPasscodes";
 const UID_COUNTER_DOC = "playerUidCounter";
 const START_PLAYER_UID = 11500001;
 const TEST_PLAYER_EMAIL = "cheiling0131@gmail.com";
@@ -285,4 +286,73 @@ export async function setCheckpointAccessByAdmin(
   await assignUidIfMissingByAuthUid(targetAuthUid);
   const nextSnap = await targetRef.get();
   return normalizePlayerState(nextSnap.data(), "", "player");
+}
+
+function isPasscodeFormatValid(code: string): boolean {
+  return /^\d{6}$/.test(code);
+}
+
+async function fetchStagePasscodes(stageId: string): Promise<string[]> {
+  const doc = await getDb().collection(CHECKPOINT_PASSCODES).doc(stageId).get();
+  const codes = doc.data()?.codes;
+  return Array.isArray(codes) ? codes.filter((code): code is string => typeof code === "string") : [];
+}
+
+export async function verifyStagePasscodeByPlayer(
+  idToken: string,
+  stageId: string,
+  code: string,
+): Promise<PlayerStateShape> {
+  const identity = await verifyIdentity(idToken);
+  const trimmedCode = code.trim();
+
+  if (!isPasscodeFormatValid(trimmedCode)) {
+    throw new Error("密碼格式錯誤，請輸入 6 位數字密碼。");
+  }
+
+  const validCodes = await fetchStagePasscodes(stageId);
+  if (!validCodes.includes(trimmedCode)) {
+    throw new Error("密碼錯誤，請再向工作人員確認通關密碼。");
+  }
+
+  const db = getDb();
+  const playerRef = db.collection(PLAYERS).doc(identity.uid);
+
+  await db.runTransaction(async (tx) => {
+    const snapshot = await tx.get(playerRef);
+    const current = normalizePlayerState(snapshot.data(), identity.email, "player");
+
+    if (current.completedStages[stageId]) {
+      return;
+    }
+
+    if (!current.unlockedStages[stageId]) {
+      throw new Error("此關卡尚未解鎖，請先完成前一關。");
+    }
+
+    const nextCompletedStages = {
+      ...current.completedStages,
+      [stageId]: true,
+    };
+
+    tx.set(
+      playerRef,
+      {
+        score: countCompletedStages(nextCompletedStages),
+        completedStages: nextCompletedStages,
+      },
+      { merge: true },
+    );
+  });
+
+  const nextSnap = await playerRef.get();
+  return normalizePlayerState(nextSnap.data(), identity.email, "player");
+}
+
+export async function listStagePasscodesByAdmin(idToken: string, stageId: string): Promise<{ codes: string[] }> {
+  const identity = await verifyIdentity(idToken);
+  await assertAdmin(identity);
+
+  const codes = await fetchStagePasscodes(stageId);
+  return { codes };
 }

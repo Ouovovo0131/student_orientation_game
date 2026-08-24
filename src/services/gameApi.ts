@@ -309,6 +309,32 @@ export async function completeStage(uid: string, stageId: StageId): Promise<Play
   }
 }
 
+export async function verifyStagePasscode(uid: string, stageId: StageId, code: string): Promise<PlayerState> {
+  await getCurrentIdentity(uid);
+
+  try {
+    const idToken = await getCurrentIdToken(uid);
+    return await callServerApi<PlayerState>("/player/verify-passcode", { idToken, stageId, code });
+  } catch (error) {
+    throw mapFirebaseError(error);
+  }
+}
+
+export async function getStagePasscodes(uid: string, stageId: StageId): Promise<string[]> {
+  const identity = await getCurrentIdentity(uid);
+  if (identity.role !== "admin") {
+    throw new Error("只有管理員可以查看通關密碼。");
+  }
+
+  try {
+    const idToken = await getCurrentIdToken(uid);
+    const data = await callServerApi<{ codes: string[] }>("/admin/checkpoint-passcodes", { idToken, stageId });
+    return data.codes;
+  } catch (error) {
+    throw mapFirebaseError(error);
+  }
+}
+
 export async function redeem(uid: string): Promise<PlayerState> {
   await getCurrentIdentity(uid);
   const ref = getPlayerRef(uid);
