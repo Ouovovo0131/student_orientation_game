@@ -13,6 +13,7 @@ import { CHECKPOINTS } from "../assets/checkpoints";
 import { getFirebaseAuth, getFirebaseDb } from "../firebase/client";
 import type { PlayerRole, PlayerState, RedeemControl, RedeemStats, StageId } from "../types";
 import { isStageUnlocked } from "../utils/checkpointAccess";
+import { getRedeemClassForAccount, REDEEM_CLASSES } from "../utils/redeemClassStats";
 import {
   getLocallyUnlockedStages,
 } from "../utils/checkpointUnlock";
@@ -493,6 +494,15 @@ export async function getRedeemStats(uid: string, totalCheckpoints: number): Pro
     let redeemedPlayers = 0;
     let waitingRedeemPlayers = 0;
     const requestedAccounts: string[] = [];
+    const classStats = REDEEM_CLASSES.map((classDefinition) => ({
+      classId: classDefinition.id,
+      className: classDefinition.name,
+      totalPlayers: 0,
+      eligiblePlayers: 0,
+      ineligiblePlayers: 0,
+      redeemedPlayers: 0,
+      waitingRedeemPlayers: 0,
+    }));
 
     snapshot.forEach((docSnapshot) => {
       const state = normalizePlayerState(docSnapshot.data());
@@ -517,6 +527,27 @@ export async function getRedeemStats(uid: string, totalCheckpoints: number): Pro
       if (state.redeemRequested && !state.isRedeemed) {
         requestedAccounts.push(state.account || docSnapshot.id);
       }
+
+      const classDefinition = getRedeemClassForAccount(state.account);
+      const classStat = classDefinition
+        ? classStats.find((item) => item.classId === classDefinition.id)
+        : undefined;
+      if (!classStat) {
+        return;
+      }
+
+      classStat.totalPlayers += 1;
+      if (state.score >= totalCheckpoints) {
+        classStat.eligiblePlayers += 1;
+      } else {
+        classStat.ineligiblePlayers += 1;
+      }
+
+      if (state.isRedeemed) {
+        classStat.redeemedPlayers += 1;
+      } else if (state.score >= totalCheckpoints) {
+        classStat.waitingRedeemPlayers += 1;
+      }
     });
 
     requestedAccounts.sort((a, b) => a.localeCompare(b));
@@ -528,6 +559,7 @@ export async function getRedeemStats(uid: string, totalCheckpoints: number): Pro
       redeemedPlayers,
       waitingRedeemPlayers,
       requestedAccounts,
+      classStats,
     };
   } catch (error) {
     throw mapFirebaseError(error);

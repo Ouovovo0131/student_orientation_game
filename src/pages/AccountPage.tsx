@@ -70,7 +70,7 @@ export function AccountPage() {
 
         <div className="mt-6 grid gap-3">
           <div className="border-4 border-black bg-white p-3">
-            <p className="text-xs font-black uppercase tracking-[0.2em]">玩家 UID（純數字）</p>
+            <p className="text-xs font-black uppercase tracking-[0.2em]">玩家 UID</p>
             <p className="mt-1 text-2xl font-black">{player?.playerUid ?? "尚未配發"}</p>
           </div>
         </div>

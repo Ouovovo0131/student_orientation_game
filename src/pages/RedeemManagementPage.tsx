@@ -15,6 +15,7 @@ const EMPTY_STATS: RedeemStats = {
   redeemedPlayers: 0,
   waitingRedeemPlayers: 0,
   requestedAccounts: [],
+  classStats: [],
 };
 
 export function RedeemManagementPage() {
@@ -105,6 +106,34 @@ export function RedeemManagementPage() {
           <NeoBadge tone="warning">無法兌獎人數：{stats.ineligiblePlayers}</NeoBadge>
           <NeoBadge tone="info">已兌獎人數：{stats.redeemedPlayers}</NeoBadge>
           <NeoBadge tone="success">待兌獎人數：{stats.waitingRedeemPlayers}</NeoBadge>
+        </div>
+        <div className="mt-5 overflow-x-auto border-4 border-black bg-white">
+          <table className="min-w-[760px] w-full text-left text-sm">
+            <thead className="bg-[#FFD644] font-black">
+              <tr>
+                <th className="border-b-2 border-black px-3 py-2">班級</th>
+                <th className="border-b-2 border-black px-3 py-2">已登入</th>
+                <th className="border-b-2 border-black px-3 py-2">可兌獎</th>
+                <th className="border-b-2 border-black px-3 py-2">無法兌獎</th>
+                <th className="border-b-2 border-black px-3 py-2">已兌獎</th>
+                <th className="border-b-2 border-black px-3 py-2">待兌獎</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stats.classStats.map((classStat) => (
+                <tr key={classStat.classId} className="font-bold even:bg-[#FFF8E8]">
+                  <th scope="row" className="border-b-2 border-black px-3 py-2 text-left">
+                    {classStat.className}
+                  </th>
+                  <td className="border-b-2 border-black px-3 py-2">{classStat.totalPlayers}</td>
+                  <td className="border-b-2 border-black px-3 py-2">{classStat.eligiblePlayers}</td>
+                  <td className="border-b-2 border-black px-3 py-2">{classStat.ineligiblePlayers}</td>
+                  <td className="border-b-2 border-black px-3 py-2">{classStat.redeemedPlayers}</td>
+                  <td className="border-b-2 border-black px-3 py-2">{classStat.waitingRedeemPlayers}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
         <div className="mt-5 border-4 border-black bg-white p-4">
           <h3 className="text-lg font-black">已送出可兌換通知的帳號</h3>

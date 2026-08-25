@@ -46,6 +46,17 @@ export interface RedeemStats {
   redeemedPlayers: number;
   waitingRedeemPlayers: number;
   requestedAccounts: string[];
+  classStats: RedeemClassStats[];
+}
+
+export interface RedeemClassStats {
+  classId: string;
+  className: string;
+  totalPlayers: number;
+  eligiblePlayers: number;
+  ineligiblePlayers: number;
+  redeemedPlayers: number;
+  waitingRedeemPlayers: number;
 }
 
 export interface UserSession {
