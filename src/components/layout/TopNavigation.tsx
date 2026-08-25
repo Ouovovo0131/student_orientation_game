@@ -1,4 +1,4 @@
-import { Home, UserRound } from "lucide-react";
+import { Home, Map, UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useGame } from "../../hooks/useGame";
 import { NeoButton } from "../ui/NeoButton";
@@ -21,6 +21,11 @@ export function TopNavigation({ score, total }: TopNavigationProps) {
         </Link>
         <div className="flex items-center gap-3">
           <NeoBadge tone="info">分數 {score} / {total}</NeoBadge>
+          <Link to="/map">
+            <NeoButton variant="secondary" className="min-h-0 px-3 py-2 text-sm">
+              <Map className="mr-1 inline" size={16} /> 查看地圖
+            </NeoButton>
+          </Link>
           {uid && (
             <Link to="/account">
               <NeoButton variant="secondary" className="min-h-0 px-3 py-2 text-sm">
