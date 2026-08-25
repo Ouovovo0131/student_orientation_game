@@ -84,7 +84,7 @@ export function RedeemPage() {
             <h1 className="relative text-3xl font-black">你可以兌換獎品了</h1>
             <p className="relative mt-3 text-base">
               {requested
-                ? "已送出兌換通知，請等待現場人員引導。"
+                ? "已送出兌換通知，請將此畫面出示給班級輔導員查看並領取獎品。"
                 : "請按下方按鈕進行兌換。"}
             </p>
           </div>
@@ -105,7 +105,7 @@ export function RedeemPage() {
 
           {requested && (
             <div className="mt-4 border-4 border-black bg-[#3BEA7D] p-3 text-center text-base font-black">
-              兌換通知已送出，請等待現場人員引導。
+              已送出兌換通知，請將此畫面出示給班級輔導員查看並領取獎品。
             </div>
           )}
         </NeoCard>
