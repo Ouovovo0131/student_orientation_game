@@ -5,6 +5,7 @@ import { PageContainer } from "../components/layout/PageContainer";
 import { NeoButton } from "../components/ui/NeoButton";
 import { NeoCard } from "../components/ui/NeoCard";
 import { SectionTitle } from "../components/ui/SectionTitle";
+import { useDeviceHeading } from "../hooks/useDeviceHeading";
 import { useGeolocation } from "../hooks/useGeolocation";
 import {
   buildProjection,
@@ -21,6 +22,7 @@ export function MapPage() {
   const isCalibrating = searchParams.get("calibrate") === "1";
 
   const { status, fix, message, start, stop } = useGeolocation();
+  const heading = useDeviceHeading();
   const [draftPoints, setDraftPoints] = useState<CalibrationPoint[]>([]);
   const [pendingFix, setPendingFix] = useState<{ lat: number; lng: number } | null>(null);
 
@@ -42,6 +44,25 @@ export function MapPage() {
   }, [fix, projection]);
 
   const isTracking = status === "locating" || status === "tracking";
+
+  // 圖上的朝向角度。地圖不是正北朝上，所以要走 screenAngleForBearing 換算。
+  const headingAngle = useMemo(() => {
+    if (heading.heading === null || !projection) {
+      return null;
+    }
+    return projection.screenAngleForBearing(heading.heading);
+  }, [heading.heading, projection]);
+
+  // iOS 的方位權限只能在使用者手勢裡要，所以跟定位綁在同一顆按鈕。
+  function handleToggleTracking() {
+    if (isTracking) {
+      stop();
+      heading.stop();
+      return;
+    }
+    start();
+    void heading.start();
+  }
 
   function handleMapClick(event: MouseEvent<SVGSVGElement>) {
     if (!isCalibrating || !pendingFix) {
@@ -81,7 +102,7 @@ export function MapPage() {
           <NeoButton
             type="button"
             className="px-4 py-2"
-            onClick={isTracking ? stop : start}
+            onClick={handleToggleTracking}
           >
             {status === "locating" ? (
               <LoaderCircle className="mr-1 inline animate-spin" size={18} />
@@ -96,7 +117,17 @@ export function MapPage() {
               定位誤差約 {Math.round(fix.accuracy)} 公尺
             </span>
           ) : null}
+
+          {isTracking && heading.heading !== null ? (
+            <span className="text-sm font-bold">
+              面向 {compassLabel(heading.heading)}
+            </span>
+          ) : null}
         </div>
+
+        {isTracking && heading.message ? (
+          <p className="mt-3 border-4 border-black bg-[#FFF8E8] p-3 text-sm font-bold">{heading.message}</p>
+        ) : null}
 
         {message ? (
           <p className="mt-3 border-4 border-black bg-[#FF6A6A] p-3 text-sm font-bold">{message}</p>
@@ -144,6 +175,20 @@ export function MapPage() {
                     stroke="#000"
                     strokeWidth={4}
                   />
+                  {headingAngle !== null ? (
+                    <g transform={`rotate(${headingAngle} ${marker.x} ${marker.y})`}>
+                      <path
+                        d={`M ${marker.x} ${marker.y - 78}
+                            L ${marker.x + 30} ${marker.y - 12}
+                            L ${marker.x} ${marker.y - 26}
+                            L ${marker.x - 30} ${marker.y - 12} Z`}
+                        fill="#3BEA7D"
+                        stroke="#000"
+                        strokeWidth={6}
+                        strokeLinejoin="round"
+                      />
+                    </g>
+                  ) : null}
                   <circle cx={marker.x} cy={marker.y} r={18} fill="#3BEA7D" stroke="#000" strokeWidth={7} />
                 </>
               ) : null}
@@ -165,6 +210,7 @@ export function MapPage() {
         <p className="mt-3 text-sm">
           地圖北方朝左（見圖右下角指北針）。定位會有數公尺到十幾公尺的誤差，
           綠色圈圈是誤差範圍，站在建築物之間時誤差會更大。
+          綠色箭頭是你正面朝的方向，手機請放平再看，靠近鐵欄杆或大型金屬時羅盤會飄。
         </p>
 
         {isCalibrating ? (
@@ -182,6 +228,14 @@ export function MapPage() {
       </NeoCard>
     </PageContainer>
   );
+}
+
+const COMPASS_LABELS = ["北", "東北", "東", "東南", "南", "西南", "西", "西北"];
+
+/** 把方位角換成「北」「東南」這種讀得懂的說法 */
+function compassLabel(bearingDeg: number): string {
+  const index = Math.round((((bearingDeg % 360) + 360) % 360) / 45) % 8;
+  return COMPASS_LABELS[index];
 }
 
 interface CalibrationPanelProps {
