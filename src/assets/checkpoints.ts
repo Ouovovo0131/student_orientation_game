@@ -76,11 +76,9 @@ export const CHECKPOINTS: Checkpoint[] = [
     title: "關卡 7：萬卷禁庫書 | 圖書館",
     description: "提供豐富藏書、寧靜的自習空間與資訊檢索服務。",
     videoUrl: "https://www.youtube.com/watch?v=hlZI3T-rOcQ",
-    quiz: {
-      prompt: "以下關於圖書館的資訊哪項錯誤？",
-      options: ["A: 可以報名晚自習", "B: 可以報名圖書館志工", "C: 可以報名午間師生讀書會", "D: 借書不用帶學生證"],
-      answerIndex: 3,
-      explanation: "借書一定要帶學生證，圖書館的晚自習、志工、午間師生讀書會都可以報名參加。",
+    staffPasscode: {
+      staffLabel: "圖書館老師、工作人員",
+      instruction: "請前往尋找圖書館的老師，和他們完成 Q&A 問答，並取得通關密碼後在下方輸入完成關卡。",
     },
   },
 ];
