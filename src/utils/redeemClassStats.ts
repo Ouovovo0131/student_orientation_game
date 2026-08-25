@@ -5,7 +5,7 @@ export interface RedeemClassDefinition {
   lastStudentNumber: number;
 }
 
-const GRADE_CODE = "510";
+const GRADE_CODE = "高一";
 const CLASS_SIZES = [30, 30, 30, 33, 32, 33, 32, 33, 32, 9, 26, 11];
 
 let firstStudentNumber = 1;
