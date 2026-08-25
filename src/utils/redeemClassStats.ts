@@ -6,7 +6,7 @@ export interface RedeemClassDefinition {
 }
 
 const GRADE_CODE = "高一";
-const CLASS_SIZES = [30, 30, 30, 33, 32, 33, 32, 33, 32, 9, 26, 11];
+const CLASS_SIZES = [31, 31, 31, 33, 32, 33, 32, 33, 32, 9, 26, 11];
 
 let firstStudentNumber = 1;
 
