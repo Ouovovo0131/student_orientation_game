@@ -74,7 +74,8 @@ export function MapPage() {
     setDraftPoints((current) => [
       ...current,
       {
-        label: `校正點 ${current.length + 1}`,
+        // 接續 geo.ts 既有的編號，之後再進場補點時才不會跟現有的撞名。
+        label: `校正點 ${CALIBRATION_POINTS.length + current.length + 1}`,
         lat: pendingFix.lat,
         lng: pendingFix.lng,
         x: Math.round(x),
