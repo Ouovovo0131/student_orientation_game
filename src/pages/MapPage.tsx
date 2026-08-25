@@ -14,7 +14,7 @@ export function MapPage() {
         type="button"
         variant="secondary"
         className="mb-4 px-4 py-2"
-        onClick={() => navigate(-1)}
+        onClick={() => navigate("/checkpoints")}
       >
         <ArrowLeft className="mr-1 inline" size={18} />
         返回上一頁

@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Map } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { CHECKPOINTS } from "../assets/checkpoints";
 import { CheckpointCard } from "../components/checkpoint/CheckpointCard";
 import { PageContainer } from "../components/layout/PageContainer";
+import { NeoButton } from "../components/ui/NeoButton";
 import { NeoProgress } from "../components/ui/NeoProgress";
 import { SectionTitle } from "../components/ui/SectionTitle";
 import { useGame } from "../hooks/useGame";
@@ -53,7 +55,15 @@ export function CheckpointListPage() {
 
   return (
     <PageContainer>
-      <SectionTitle>關卡列表</SectionTitle>
+      <div className="flex items-center justify-between gap-4">
+        <SectionTitle>關卡列表</SectionTitle>
+        <Link to="/map">
+          <NeoButton variant="secondary" className="px-4 py-2">
+            <Map className="mr-1 inline" size={18} />
+            查看地圖
+          </NeoButton>
+        </Link>
+      </div>
       <NeoProgress value={score} max={totalCheckpoints} />
       <div className="mt-5 grid gap-4 md:grid-cols-2">
         {CHECKPOINTS.map((checkpoint) => (
