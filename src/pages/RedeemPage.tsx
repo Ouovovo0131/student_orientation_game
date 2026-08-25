@@ -39,6 +39,12 @@ export function RedeemPage() {
     };
   }, [canRedeemNow, requested]);
 
+  useEffect(() => {
+    if (canRedeemNow) {
+      launchCelebrationConfetti();
+    }
+  }, [canRedeemNow]);
+
   if (redeemed && !isAdmin) return null;
 
   if (isAdmin) {
@@ -90,7 +96,6 @@ export function RedeemPage() {
                 disabled={loading}
                 onClick={async () => {
                   await requestRedeemTicket();
-                  launchCelebrationConfetti();
                 }}
               >
                 {loading ? "送出中..." : "我要兌換獎品"}
