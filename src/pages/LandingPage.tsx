@@ -4,6 +4,7 @@ import { NeoButton } from "../components/ui/NeoButton";
 import { NeoCard } from "../components/ui/NeoCard";
 import { SectionTitle } from "../components/ui/SectionTitle";
 import { useGame } from "../hooks/useGame";
+import { requestHeadingPermission } from "../hooks/useDeviceHeading";
 
 export function LandingPage() {
   const { uid } = useGame();
@@ -27,7 +28,7 @@ export function LandingPage() {
               <NeoButton className="w-full px-8 py-4 text-lg sm:w-auto">開始闖關</NeoButton>
             </Link>
           )}
-          <Link to="/map">
+          <Link to="/map" onClick={() => void requestHeadingPermission()}>
             <NeoButton variant="secondary" className="w-full px-8 py-4 text-lg sm:w-auto">查看地圖</NeoButton>
           </Link>
         </div>

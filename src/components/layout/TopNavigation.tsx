@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useGame } from "../../hooks/useGame";
 import { NeoButton } from "../ui/NeoButton";
 import { NeoBadge } from "../ui/NeoBadge";
+import { requestHeadingPermission } from "../../hooks/useDeviceHeading";
 
 interface TopNavigationProps {
   score: number;
@@ -21,7 +22,7 @@ export function TopNavigation({ score, total }: TopNavigationProps) {
         </Link>
         <div className="flex items-center gap-3">
           <NeoBadge tone="info">分數 {score} / {total}</NeoBadge>
-          <Link to="/map">
+          <Link to="/map" onClick={() => void requestHeadingPermission()}>
             <NeoButton variant="secondary" className="min-h-0 px-3 py-2 text-sm">
               <Map className="mr-1 inline" size={16} /> 查看地圖
             </NeoButton>
