@@ -35,13 +35,26 @@
         <div style="margin: 48px auto 0; max-width: 320px; border: 4px solid #101014; background: #FFF6D6; padding: 20px;">
           <p style="margin: 0 0 8px; font-size: 18px; font-weight: 800;">新生闖關</p>
           <p style="margin: 0; font-size: 15px; font-weight: 700;">載入中，請稍候…</p>
-          <p style="margin: 12px 0 0; font-size: 13px; line-height: 1.6;">
+          <p id="boot-hint" style="margin: 12px 0 0; font-size: 13px; line-height: 1.6;">
             如果一直停在這裡，代表現在的訊號比較弱。<br />
             請往走廊或窗邊移動，或改用行動網路再試一次。
           </p>
         </div>
       </div>
     </div>
+    <!--
+      等太久就換一段更明確的說法。React 一掛載就會把整個 #root 換掉，所以這段
+      文字只有在「程式包始終沒跑起來」的時候才看得到 —— 那正是現場最需要知道
+      該怎麼辦的時刻（訊號太弱、或用了掃描 App 的內建瀏覽器）。
+    -->
+    <script>
+      setTimeout(function () {
+        var hint = document.getElementById("boot-hint");
+        if (!hint) return;
+        hint.innerHTML =
+          "載入時間比平常久。<br />請確認訊號，或點右上角選單改用 Safari／Chrome 開啟這個網址。";
+      }, 15000);
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
