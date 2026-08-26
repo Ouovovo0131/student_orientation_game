@@ -1,5 +1,5 @@
 import { ArrowLeft, Crosshair, LoaderCircle } from "lucide-react";
-import { useMemo, useState, type MouseEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PageContainer } from "../components/layout/PageContainer";
 import { NeoButton } from "../components/ui/NeoButton";
@@ -61,8 +61,24 @@ export function MapPage() {
       return;
     }
     start();
-    void heading.start();
+    void heading.start(true);
   }
+
+  // 一進頁面就開始定位，不用等他按按鈕。按鈕留著給他隨時關掉或重開。
+  //
+  // 方位這邊只在不需要授權的平台（Android、桌機）自動接上；iOS 一定要手勢才能
+  // 要權限，所以那邊要等他按按鈕，箭頭才會出現。
+  const autoStartedRef = useRef(false);
+  useEffect(() => {
+    if (autoStartedRef.current) {
+      return;
+    }
+    autoStartedRef.current = true;
+    start();
+    void heading.start(false);
+    // 只在掛載時跑一次；之後開關都由按鈕控制。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function handleMapClick(event: MouseEvent<SVGSVGElement>) {
     if (!isCalibrating || !pendingFix) {

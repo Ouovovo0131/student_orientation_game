@@ -69,15 +69,27 @@ export function useDeviceHeading() {
     setStatus("idle");
   }, [handleOrientation]);
 
-  const start = useCallback(async () => {
+  /**
+   * fromUserGesture 為 false 代表這是進頁面時自動呼叫的。
+   *
+   * iOS 的方位權限只能在使用者手勢裡要，自動呼叫一定會被拒絕 —— 那會讓使用者
+   * 一進來就看到一則他不知道怎麼解決的錯誤訊息。所以自動呼叫時遇到需要授權的
+   * 平台就安靜地不做事，等他按下按鈕再要權限。
+   */
+  const start = useCallback(async (fromUserGesture = true) => {
     if (typeof window === "undefined" || typeof DeviceOrientationEvent === "undefined") {
-      setStatus("unsupported");
-      setMessage("這台裝置沒有提供方位感測器，只會顯示位置不會顯示朝向。");
+      if (fromUserGesture) {
+        setStatus("unsupported");
+        setMessage("這台裝置沒有提供方位感測器，只會顯示位置不會顯示朝向。");
+      }
       return;
     }
 
     const api = DeviceOrientationEvent as unknown as OrientationPermissionApi;
     if (typeof api.requestPermission === "function") {
+      if (!fromUserGesture) {
+        return;
+      }
       try {
         const result = await api.requestPermission();
         if (result !== "granted") {
