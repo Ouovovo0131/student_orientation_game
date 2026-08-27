@@ -66,9 +66,9 @@ export const CHECKPOINTS: Checkpoint[] = [
     videoUrl: "https://www.youtube.com/watch?v=ZnECuuwq8ac",
     quiz: {
       prompt: "高一繳交假卡要找哪一位學創老師？",
-      options: ["A: 陳德剛老師", "B: 李婕老師", "C: 劉俊恩老師", "D: 李曉薇老師"],
+      options: ["A: 陳德鋼老師", "B: 李婕老師", "C: 劉俊恩老師", "D: 李曉薇老師"],
       answerIndex: 0,
-      explanation: "高一的學創老師要記清楚，是德剛老師跟清平老師。",
+      explanation: "高一的學創老師要記清楚，是德鋼老師跟清平老師。",
     },
   },
   {
